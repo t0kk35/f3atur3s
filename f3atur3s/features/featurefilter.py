@@ -4,7 +4,7 @@ Definition of the concatenating feature. It is a feature directly that concatena
 """
 from dataclasses import dataclass
 
-from common.typechecking import enforce_types
+from ..common.typechecking import enforce_types
 from .featureexpression import FeatureExpression
 
 

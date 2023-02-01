@@ -5,7 +5,7 @@ class methods seem to get lost in data classes. This class bundles some class me
 """
 from typing import Type, List, TypeVar
 
-from common import Feature, FeatureType
+from ..common.feature import Feature, FeatureType
 
 T = TypeVar('T')
 

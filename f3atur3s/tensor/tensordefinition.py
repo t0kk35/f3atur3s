@@ -5,12 +5,13 @@ Definition of the TensorDefinition feature. It is used to bundle Feature objects
 
 from typing import List, Tuple
 
-from common import TensorDefinitionException
-from common import Feature, FeatureExpander, FeatureTypeNumerical
-from common import LearningCategory, LEARNING_CATEGORY_CATEGORICAL, LEARNING_CATEGORY_CONTINUOUS
-from common import LEARNING_CATEGORY_BINARY, LEARNING_CATEGORY_LABEL, LEARNING_CATEGORIES_MODEL
-from features import FeatureIndex, FeatureOneHot
-from features import FeatureHelper
+from ..common.exception import TensorDefinitionException
+from ..common.feature import Feature, FeatureExpander, FeatureTypeNumerical
+from ..common.learningcategory import LearningCategory, LEARNING_CATEGORY_CATEGORICAL, LEARNING_CATEGORY_CONTINUOUS
+from ..common.learningcategory import LEARNING_CATEGORY_BINARY, LEARNING_CATEGORY_LABEL, LEARNING_CATEGORIES_MODEL
+from ..features.featureindex import FeatureIndex
+from ..features.featureonehot import FeatureOneHot
+from .featurehelper import FeatureHelper
 
 
 class TensorDefinition:

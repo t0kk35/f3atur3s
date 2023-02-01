@@ -3,7 +3,7 @@ Unit Tests for FeatureNormalizeStandard Creation
 (c) 2023 tsm
 """
 import unittest
-import f3atur3s.features as ft
+import f3atur3s as ft
 
 
 class TestNormalizeStandardFeature(unittest.TestCase):

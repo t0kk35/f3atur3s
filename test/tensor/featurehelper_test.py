@@ -3,7 +3,7 @@ Unit Tests for the FeatureHelper Class
 (c) 2023 tsm
 """
 import unittest
-import f3atur3s.features as ft
+import f3atur3s as ft
 
 
 class TestFeatureHelper(unittest.TestCase):
