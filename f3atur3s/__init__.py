@@ -9,7 +9,7 @@ from .common.featuretype import FEATURE_TYPE_BOOL
 from .common.featuretype import FEATURE_TYPE_DATE_TIME
 from .common.featuretype import FEATURE_TYPE_DATE
 from .common.featuretype import FEATURE_TYPE_CATEGORICAL
-from .common.featuretype import FeatureTypeString, FeatureTypeTimeBased
+from .common.featuretype import FeatureTypeString, FeatureTypeTimeBased, FeatureTypeInteger
 from .common.learningcategory import LearningCategory, LEARNING_CATEGORY_CATEGORICAL, LEARNING_CATEGORY_BINARY
 from .common.learningcategory import LEARNING_CATEGORY_CONTINUOUS, LEARNING_CATEGORY_LABEL, LEARNING_CATEGORIES_MODEL
 from .common.learningcategory import LEARNING_CATEGORY_NONE

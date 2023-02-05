@@ -28,24 +28,24 @@ class TestFeatureConcat(unittest.TestCase):
     def test_type_non_string_is_bad(self):
         name = 'Concat'
         f_type = ft.FEATURE_TYPE_FLOAT
-        sfb = ft.FeatureSource('base', ft.FEATURE_TYPE_FLOAT)
-        sfc = ft.FeatureSource('concat', ft.FEATURE_TYPE_FLOAT)
+        sfb = ft.FeatureSource('base', ft.FEATURE_TYPE_STRING)
+        sfc = ft.FeatureSource('concat', ft.FEATURE_TYPE_STRING)
         with self.assertRaises(ft.FeatureDefinitionException):
             _ = ft.FeatureConcat(name, f_type, sfb, sfc)
 
     def test_base_non_string_is_bad(self):
         name = 'Concat'
-        f_type = ft.FEATURE_TYPE_FLOAT
+        f_type = ft.FEATURE_TYPE_STRING
         sfb = ft.FeatureSource('base', ft.FEATURE_TYPE_FLOAT)
         sfc = ft.FeatureSource('concat', ft.FEATURE_TYPE_STRING)
         with self.assertRaises(ft.FeatureDefinitionException):
             _ = ft.FeatureConcat(name, f_type, sfb, sfc)
 
-    def test_denominator_non_numerical_is_bad(self):
+    def test_concat_non_string_is_bad(self):
         name = 'Concat'
-        f_type = ft.FEATURE_TYPE_FLOAT
-        sfb = ft.FeatureSource('base', ft.FEATURE_TYPE_FLOAT)
-        sfc = ft.FeatureSource('concat', ft.FEATURE_TYPE_STRING)
+        f_type = ft.FEATURE_TYPE_STRING
+        sfb = ft.FeatureSource('base', ft.FEATURE_TYPE_STRING)
+        sfc = ft.FeatureSource('concat', ft.FEATURE_TYPE_FLOAT)
         with self.assertRaises(ft.FeatureDefinitionException):
             _ = ft.FeatureConcat(name, f_type, sfb, sfc)
 

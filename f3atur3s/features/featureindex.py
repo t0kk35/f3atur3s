@@ -16,7 +16,7 @@ class FeatureIndex(FeatureWithBaseFeature, FeatureCategorical):
     Indexer feature. It will turn a specific input field (the base_feature) into an index. For instance 'DE'->1,
     'FR'->2, 'GB'->3 etc... The index will have an integer type and is ideal to model in embeddings.
     """
-    dictionary: Dict = field(default=None, init=False, hash=False)
+    dictionary: Dict[str, int] = field(default=None, init=False, hash=False)
 
     def __post_init__(self):
         self.val_int_type()

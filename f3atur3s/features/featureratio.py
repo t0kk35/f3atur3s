@@ -28,6 +28,7 @@ class FeatureRatio(FeatureWithBaseFeature):
         self.embedded_features = self.get_base_and_base_embedded_features()
         self.embedded_features.append(self.denominator_feature)
         self.embedded_features.extend(self.denominator_feature.embedded_features)
+        self.embedded_features = list(set(self.embedded_features))
 
     @property
     def learning_category(self) -> LearningCategory:

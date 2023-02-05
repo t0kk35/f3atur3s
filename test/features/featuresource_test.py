@@ -49,6 +49,9 @@ class TestFeatureSource(unittest.TestCase):
         f_type = ft.FEATURE_TYPE_DATE_TIME
         with self.assertRaises(ft.FeatureDefinitionException):
             _ = ft.FeatureSource(name, f_type)
+        f_type = ft.FEATURE_TYPE_DATE
+        with self.assertRaises(ft.FeatureDefinitionException):
+            _ = ft.FeatureSource(name, f_type)
 
     def test_equality(self):
         name_1 = 'test_1'
