@@ -24,6 +24,7 @@ from .features.featureonehot import FeatureOneHot
 from .features.featureexpression import FeatureExpression
 from .features.featurefilter import FeatureFilter
 from .features.featurelabelbinary import FeatureLabelBinary
+from .common.feature import FeatureNormalizeLogBase
 from .features.featurenormalizescale import FeatureNormalizeScale
 from .features.featurenormalizestandard import FeatureNormalizeStandard
 from .features.featuregrouper import TimePeriod, TIME_PERIOD_DAY, TIME_PERIOD_WEEK, TIME_PERIOD_MONTH, TIME_PERIODS
