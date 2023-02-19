@@ -3,10 +3,11 @@ Definition of the source feature. It is a feature directly found in a source.
 (c) 2023 tsm
 """
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional, Union, Dict, Any, List
 
 from ..common.typechecking import enforce_types
 from ..common.exception import FeatureDefinitionException
+from ..common.featuretype import FeatureTypeHelper
 from ..common.feature import Feature
 from ..common.featuretype import FeatureTypeTimeBased
 from ..common.learningcategory import LearningCategory
@@ -33,6 +34,13 @@ class FeatureSource(Feature):
     def learning_category(self) -> LearningCategory:
         # Should be the learning category of the type of the source feature
         return self.type.learning_category
+
+    @classmethod
+    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureSource':
+        name, tp = cls.extract_dict(fields, embedded_features)
+        fc = fields['format_code']
+        df = fields['default']
+        return FeatureSource(name, tp, fc, df)
 
     def _val_format_code_not_none_for_time(self):
         """

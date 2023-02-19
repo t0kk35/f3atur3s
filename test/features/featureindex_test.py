@@ -2,7 +2,9 @@
 Unit Tests for FeatureIndex Creation
 (c) 2023 tsm
 """
+import os
 import unittest
+import shutil
 import f3atur3s as ft
 
 
@@ -62,6 +64,50 @@ class TestIndexFeature(unittest.TestCase):
         self.assertNotEqual(fi1, fi3, f'Should have been not equal')
         self.assertNotEqual(fi1, fi4, f'Should not have been equal. Different Base Feature')
         self.assertNotEqual(fi1, fi5, f'Should not have been equal. Different Type')
+
+
+class TestFeatureIndexSaveLoad(unittest.TestCase):
+    def test_save_base(self):
+        save_file = './save-index-base'
+        shutil.rmtree(save_file, ignore_errors=True)
+        n_base = 'base-test'
+        n_i = 'index-test'
+        td_name = 'base'
+        f_type = ft.FEATURE_TYPE_INT_16
+        fb = ft.FeatureSource(n_base, ft.FEATURE_TYPE_CATEGORICAL)
+        f = ft.FeatureIndex(n_i, f_type, fb)
+        td = ft.TensorDefinition(td_name, [f])
+        ft.TensorDefinitionSaver.save(td, save_file)
+        self.assertTrue(os.path.exists(save_file), f'File does not exist {save_file}.')
+        self.assertTrue(os.path.isdir(save_file), f'{save_file} does not seem to be a directory.')
+        self.assertTrue(os.path.exists(os.path.join(save_file, f'tensor.json')), f'Did not find tensor.json')
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features')), f'Not <features> directory in {save_file}')
+        self.assertTrue(os.path.isdir(os.path.join(save_file, 'features')), f'<features> is not a directory')
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features', f'{n_i}.json')), f'No {n_i}.json')
+        self.assertTrue(os.path.isfile(os.path.join(save_file, 'features', f'{n_i}.json')), f'No {n_i}.json')
+        # We Should have the base feature also
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features', f'{n_base}.json')), f'No {n_base}.json')
+        self.assertTrue(os.path.isfile(os.path.join(save_file, 'features', f'{n_base}.json')), f'No {n_base}.json')
+        shutil.rmtree(save_file, ignore_errors=True)
+
+    def test_load_base(self):
+        save_file = './load-index-base'
+        shutil.rmtree(save_file, ignore_errors=True)
+        n_base = 'base-test'
+        n_i = 'oh-test'
+        td_name = 'base'
+        f_type = ft.FEATURE_TYPE_INT_16
+        fb = ft.FeatureSource(n_base, ft.FEATURE_TYPE_CATEGORICAL)
+        f = ft.FeatureIndex(n_i, f_type, fb)
+        td = ft.TensorDefinition(td_name, [f])
+        ft.TensorDefinitionSaver.save(td, save_file)
+        td_new = ft.TensorDefinitionLoader.load(save_file)
+        self.assertEqual(td_new.name, td.name, f'Names not equal {td_new.name} {td.name}')
+        self.assertEqual(td_new.inference_ready, td.inference_ready, f'Inference state not equal')
+        self.assertListEqual(td_new.learning_categories, td.learning_categories, f'Learning Cat not equal')
+        self.assertEqual(td_new.features[0], td.features[0], 'Main Feature not the same')
+        self.assertListEqual(td_new.embedded_features, td.embedded_features, f'Embedded features not the same')
+        shutil.rmtree(save_file, ignore_errors=True)
 
 
 def main():

@@ -2,8 +2,8 @@
 Definition of the base features types. These are all helper or abstract classes
 (c) 2023 tsm
 """
-from dataclasses import dataclass, field
-from typing import List, Type, Optional
+from dataclasses import dataclass, field, asdict
+from typing import List, Type, Optional, Dict, Any, Tuple
 from abc import ABC, abstractmethod
 
 from .typechecking import enforce_types
@@ -11,6 +11,7 @@ from .learningcategory import LearningCategory, LEARNING_CATEGORY_CATEGORICAL, L
 from .learningcategory import LEARNING_CATEGORY_CONTINUOUS
 from .featuretype import FeatureType, FeatureTypeInteger, FeatureTypeFloat, FeatureTypeNumerical, FeatureTypeString
 from .featuretype import FeatureTypeBool
+from .featuretype import FeatureTypeHelper
 from .exception import FeatureDefinitionException, not_implemented
 
 
@@ -24,6 +25,16 @@ class Feature(ABC):
     name: str
     type: FeatureType
     embedded_features: List['Feature'] = field(default_factory=list, init=False, hash=False, repr=False)
+
+    def __dict__(self) -> Dict[str, Any]:
+        json = asdict(self)
+        # We don't need the full embedded features, just the names.
+        json['embedded_features'] = [e['name'] for e in json['embedded_features']]
+        # Don't need the learning category either, its derived
+        del json['type']['learning_category']
+        # But we do need to know the feature class
+        json['class'] = self.__class__.__name__
+        return json
 
     def _val_type(self, f_type: Type[FeatureType]) -> None:
         """
@@ -102,6 +113,17 @@ class Feature(ABC):
         """
         return not_implemented(self)
 
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, fields: Dict[str, Any], embedded_features: List['Feature']) -> 'Feature':
+        pass
+
+    @classmethod
+    def extract_dict(cls, fields: Dict[str, Any], embedded_feature: List['Feature']) -> Tuple[Any, ...]:
+        name = fields['name']
+        tp = FeatureTypeHelper.get_type(fields['type']['key'])
+        return name, tp
+
 
 class FeatureCategorical(Feature, ABC):
     """
@@ -129,6 +151,18 @@ class FeatureWithBaseFeature(Feature, ABC):
     feature. There's a bunch of derived features that will have a base feature.
     """
     base_feature: Feature
+
+    def __dict__(self) -> Dict[str, Any]:
+        json = super().__dict__()
+        # Just need to keep the name of the base_features
+        json['base_feature'] = json['base_feature']['name']
+        return json
+
+    @classmethod
+    def extract_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> Tuple[Any, ...]:
+        names = Feature.extract_dict(fields, embedded_features)
+        fb = [f for f in embedded_features if f.name == fields['base_feature']][0]
+        return names + (fb,)
 
     def val_base_feature_is_float(self) -> None:
         """

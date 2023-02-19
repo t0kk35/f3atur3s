@@ -3,9 +3,10 @@ Definition of the Ratio feature. It calculated a ratio between 2 other numerical
 (c) 2023 tsm
 """
 from dataclasses import dataclass
+from typing import Dict, Any, List
 
 from ..common.typechecking import enforce_types
-from ..common.feature import FeatureWithBaseFeature, Feature
+from ..common.feature import Feature, FeatureWithBaseFeature, Feature
 from ..common.learningcategory import LearningCategory
 from ..common.featuretype import FeatureTypeNumerical
 from ..common.exception import FeatureDefinitionException
@@ -30,6 +31,12 @@ class FeatureRatio(FeatureWithBaseFeature):
         self.embedded_features.extend(self.denominator_feature.embedded_features)
         self.embedded_features = list(set(self.embedded_features))
 
+    def __dict__(self) -> Dict[str, Any]:
+        json = super().__dict__()
+        # Just need to keep the name of the denominator_features
+        json['denominator_feature'] = json['denominator_feature']['name']
+        return json
+
     @property
     def learning_category(self) -> LearningCategory:
         # Should be the learning category of the type of the source feature
@@ -46,3 +53,9 @@ class FeatureRatio(FeatureWithBaseFeature):
                 f'The denominator feature {self.denominator_feature.name} of a FeatureRatio should be numerical. ' +
                 f'Got {self.denominator_feature.type} '
             )
+
+    @classmethod
+    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureRatio':
+        name, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
+        fd = [f for f in embedded_features if f.name == fields['denominator_feature']]
+        return FeatureRatio(name, tp, fb, fd[0])

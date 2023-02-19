@@ -24,3 +24,25 @@ class TensorDefinitionException(Exception):
     """
     def __init__(self, message: str):
         super().__init__("Error Defining Tensor: " + message)
+
+
+class TensorDefinitionSaverException(Exception):
+    """
+    Exception thrown when the saving of a TensorDefinition fails.
+
+    Args:
+        message: A free form text message describing the error
+    """
+    def __init__(self, tensor_name: str, message: str):
+        super().__init__(f"Error Saving Tensor: {tensor_name} Message: {message}")
+
+
+class TensorDefinitionLoaderException(Exception):
+    """
+    Exception thrown when the saving of a TensorDefinition fails.
+
+    Args:
+        message: A free form text message describing the error
+    """
+    def __init__(self, message: str):
+        super().__init__(f"Error Loading Tensor. Message: {message}")

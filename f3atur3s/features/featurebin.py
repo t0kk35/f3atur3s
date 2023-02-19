@@ -3,10 +3,11 @@ Definition of the binning feature. It is a feature directly found in a source.
 (c) 2023 tsm
 """
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Any, Dict
 
 from ..common.typechecking import enforce_types
-from ..common.feature import FeatureWithBaseFeature, FeatureCategorical
+from ..common.feature import Feature, FeatureWithBaseFeature, FeatureCategorical
+from ..common.featuretype import FeatureTypeHelper
 
 
 @enforce_types
@@ -36,3 +37,10 @@ class FeatureBin(FeatureWithBaseFeature, FeatureCategorical):
     @property
     def inference_ready(self) -> bool:
         return self.bins is not None
+
+    @classmethod
+    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureBin':
+        name, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
+        nb = fields['number_of_bins']
+        st = fields['scale_type']
+        return FeatureBin(name, tp, fb, nb, st)

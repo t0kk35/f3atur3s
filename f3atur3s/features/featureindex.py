@@ -3,10 +3,10 @@ Definition of the Indexing feature. It is a feature directly found in a source.
 (c) 2023 tsm
 """
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, Any, List
 
 from ..common.typechecking import enforce_types
-from ..common.feature import FeatureWithBaseFeature, FeatureCategorical
+from ..common.feature import Feature, FeatureWithBaseFeature, FeatureCategorical
 
 
 @enforce_types
@@ -31,3 +31,10 @@ class FeatureIndex(FeatureWithBaseFeature, FeatureCategorical):
     @property
     def inference_ready(self) -> bool:
         return self.dictionary is not None
+
+    @classmethod
+    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureIndex':
+        name, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
+        fi = FeatureIndex(name, tp, fb)
+        fi.dictionary = fields['dictionary']
+        return fi

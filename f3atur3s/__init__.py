@@ -33,3 +33,4 @@ from .features.featuregrouper import AGGREGATOR_MIN, AGGREGATOR_SUM
 from .features.featuregrouper import FeatureGrouper
 from .tensor.featurehelper import FeatureHelper
 from .tensor.tensordefinition import TensorDefinition, TensorDefinitionException
+from .tensor.tensordefinitionsaverloader import TensorDefinitionSaver, TensorDefinitionLoader

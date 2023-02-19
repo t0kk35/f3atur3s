@@ -3,8 +3,10 @@ Definition of the FeatureTypes categories
 (c) 2023 tsm
 """
 from dataclasses import dataclass, field
+from typing import Dict
 
 from .typechecking import enforce_types
+from .exception import FeatureDefinitionException
 from .learningcategory import LearningCategory, LEARNING_CATEGORY_NONE, LEARNING_CATEGORY_CATEGORICAL
 from .learningcategory import LEARNING_CATEGORY_CONTINUOUS, LEARNING_CATEGORY_BINARY
 
@@ -27,6 +29,13 @@ class FeatureType:
             return ft1
         else:
             return ft2
+
+    @classmethod
+    def get_type(cls, key: int) -> 'FeatureType':
+        try:
+            return ALL_FEATURE_TYPES[key]
+        except KeyError:
+            raise FeatureDefinitionException(f'Could not find  FeatureType with key <{key}>')
 
 
 class FeatureTypeString(FeatureType):
@@ -66,3 +75,29 @@ FEATURE_TYPE_INT_16: FeatureType = FeatureTypeInteger(9, 'INT_16', LEARNING_CATE
 FEATURE_TYPE_INT_32: FeatureType = FEATURE_TYPE_INTEGER
 FEATURE_TYPE_INT_64: FeatureType = FeatureTypeInteger(10, 'INT_64', LEARNING_CATEGORY_CATEGORICAL, 64)
 FEATURE_TYPE_BOOL: FeatureType = FeatureTypeBool(11, 'INT_8', LEARNING_CATEGORY_BINARY, 8)
+
+
+ALL_FEATURE_TYPES: Dict[int, FeatureType] = {
+    FEATURE_TYPE_STRING.key: FEATURE_TYPE_STRING,
+    FEATURE_TYPE_CATEGORICAL.key: FEATURE_TYPE_CATEGORICAL,
+    FEATURE_TYPE_FLOAT.key: FEATURE_TYPE_FLOAT,
+    FEATURE_TYPE_FLOAT_32.key: FEATURE_TYPE_FLOAT_32,
+    FEATURE_TYPE_FLOAT_64.key: FEATURE_TYPE_FLOAT_64,
+    FEATURE_TYPE_DATE.key: FEATURE_TYPE_DATE,
+    FEATURE_TYPE_DATE_TIME.key: FEATURE_TYPE_DATE_TIME,
+    FEATURE_TYPE_INTEGER.key: FEATURE_TYPE_INTEGER,
+    FEATURE_TYPE_INT_8.key: FEATURE_TYPE_INT_8,
+    FEATURE_TYPE_INT_16.key: FEATURE_TYPE_INT_16,
+    FEATURE_TYPE_INT_32.key: FEATURE_TYPE_INT_32,
+    FEATURE_TYPE_INT_64.key: FEATURE_TYPE_INT_64,
+    FEATURE_TYPE_BOOL.key: FEATURE_TYPE_BOOL
+}
+
+
+class FeatureTypeHelper:
+    @classmethod
+    def get_type(cls, key: int) -> FeatureType:
+        try:
+            return ALL_FEATURE_TYPES[key]
+        except KeyError:
+            raise FeatureDefinitionException(f'Could not find  FeatureType with key <{key}>')

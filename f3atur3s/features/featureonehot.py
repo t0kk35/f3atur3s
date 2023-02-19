@@ -3,10 +3,11 @@ Definition of the Indexing feature. It is a feature directly found in a source.
 (c) 2023 tsm
 """
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict, Any
 
 from ..common.typechecking import enforce_types
-from ..common.feature import FeatureExpander, LearningCategory
+from ..common.feature import Feature, FeatureWithBaseFeature, FeatureExpander, LearningCategory
+from ..common.featuretype import FeatureTypeHelper
 from ..common.learningcategory import LEARNING_CATEGORY_BINARY
 from .featurevirtual import FeatureVirtual
 
@@ -39,3 +40,10 @@ class FeatureOneHot(FeatureExpander):
     def learning_category(self) -> LearningCategory:
         # Treat One Hot Features as 'Binary' learning category. Even though they are encoded as integers.
         return LEARNING_CATEGORY_BINARY
+
+    @classmethod
+    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureOneHot':
+        name, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
+        oh = FeatureOneHot(name, tp, fb)
+        oh.expand_names = fields['expand_names']
+        return oh
