@@ -22,6 +22,7 @@ from .features.featureconcat import FeatureConcat
 from .features.featurevirtual import FeatureVirtual
 from .features.featureonehot import FeatureOneHot
 from .features.featureexpression import FeatureExpression
+from .features.featureexpression import FeatureExpressionSeries
 from .features.featurefilter import FeatureFilter
 from .features.featurelabelbinary import FeatureLabelBinary
 from .common.feature import FeatureNormalizeLogBase
@@ -31,6 +32,7 @@ from .features.featuregrouper import TimePeriod, TIME_PERIOD_DAY, TIME_PERIOD_WE
 from .features.featuregrouper import Aggregator, AGGREGATOR_COUNT, AGGREGATOR_STDDEV, AGGREGATOR_AVG, AGGREGATOR_MAX
 from .features.featuregrouper import AGGREGATOR_MIN, AGGREGATOR_SUM
 from .features.featuregrouper import FeatureGrouper
+from .features.featureseriesstacked import FeatureSeriesStacked
 from .tensor.featurehelper import FeatureHelper
 from .tensor.tensordefinition import TensorDefinition, TensorDefinitionException
 from .tensor.tensordefinitionsaverloader import TensorDefinitionSaver, TensorDefinitionLoader

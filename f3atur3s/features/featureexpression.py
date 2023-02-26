@@ -4,12 +4,13 @@ Definition of the concatenating feature. It is a feature directly that concatena
 """
 from dataclasses import dataclass, field
 from inspect import signature, isfunction
-from typing import Callable, List
+from typing import Callable, List, Dict, Any
 from abc import ABC
 
 from ..common.typechecking import enforce_types
 from ..common.feature import Feature, LearningCategory
 from ..common.feature import FeatureDefinitionException
+from ..common.featuresave import FeatureWithPickle
 
 
 @dataclass(unsafe_hash=True)
@@ -62,7 +63,8 @@ class _ExpressionBased(Feature, ABC):
     def is_lambda(self) -> bool:
         """Flag indicating if the expression that is used to build the feature is a Lambda style callable
 
-        :return: Boolean. True if the expression is a Lambda.
+        Return:
+             True if the expression is a Lambda.
         """
         return self.expression.__name__ == '<lambda>'
 
@@ -74,7 +76,7 @@ class _ExpressionBased(Feature, ABC):
 
 @enforce_types
 @dataclass(unsafe_hash=True)
-class FeatureExpression(_ExpressionBased):
+class FeatureExpression(_ExpressionBased, FeatureWithPickle):
     """
     Derived Feature. This is a Feature that will be built off of other features using a function. It can be used
     to perform all sorts of custom operations on other features, such as adding, formatting, calculating ratio's etc...
@@ -90,3 +92,53 @@ class FeatureExpression(_ExpressionBased):
         for pf in self.param_features:
             self.embedded_features.extend(pf.embedded_features)
         self.embedded_features = list(set(self.embedded_features))
+
+    def __dict__(self) -> Dict[str, Any]:
+        json = super().__dict__()
+        # We only need the names of the parameter features
+        json['param_features'] = [f['name'] for f in json['param_features']]
+        # Need to remove the expression, that will be pickled
+        del json['expression']
+        return json
+
+    def get_pickle(self) -> Any:
+        return self.expression
+
+    @classmethod
+    def create_from_save(
+            cls, fields: Dict[str, Any], embedded_features: List['Feature'], pkl: Any) -> 'FeatureExpression':
+        name, tp = Feature.extract_dict(fields, embedded_features)
+        param = [eb for eb in embedded_features for f in fields['param_features'] if eb.name == f]
+        return FeatureExpression(name, tp, pkl, param)
+
+
+@enforce_types
+@dataclass(unsafe_hash=True)
+class FeatureExpressionSeries(_ExpressionBased, FeatureWithPickle):
+    def __post_init__(self):
+        # Run post init validation.
+        self._val_expression_not_lambda()
+        self._val_parameters_is_features_list(self.param_features)
+        self._val_function_is_callable(self.expression, self.param_features)
+        # The parameters needed to run the function are the embedded features
+        self.embedded_features.extend(self.param_features)
+        for pf in self.param_features:
+            self.embedded_features.extend(pf.embedded_features)
+        self.embedded_features = list(set(self.embedded_features))
+
+    def __dict__(self) -> Dict[str, Any]:
+        json = super().__dict__()
+        # We only need the names of the parameter features
+        json['param_features'] = [f['name'] for f in json['param_features']]
+        # Need to remove the expression, that will be pickled
+        del json['expression']
+        return json
+
+    def get_pickle(self) -> Any:
+        return self.expression
+
+    @classmethod
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List['Feature'], pkl: Any) -> 'Feature':
+        name, tp = Feature.extract_dict(fields, embedded_features)
+        param = [eb for eb in embedded_features for f in fields['param_features'] if eb.name == f]
+        return FeatureExpressionSeries(name, tp, pkl, param)

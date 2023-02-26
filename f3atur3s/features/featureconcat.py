@@ -3,10 +3,11 @@ Definition of the concatenating feature. It is a feature directly that concatena
 (c) 2023 tsm
 """
 from dataclasses import dataclass
+from typing import Dict, Any, List
 
 from ..common.typechecking import enforce_types
 from ..common.feature import FeatureWithBaseFeature, Feature, LearningCategory, FeatureTypeString
-from ..common.feature import FeatureDefinitionException
+from ..common.feature import FeatureDefinitionException, FeatureWithBaseFeature
 
 
 @enforce_types
@@ -26,6 +27,12 @@ class FeatureConcat(FeatureWithBaseFeature):
         self.embedded_features.append(self.concat_feature)
         self.embedded_features.extend(self.concat_feature.embedded_features)
 
+    def __dict__(self) -> Dict[str, Any]:
+        json = super().__dict__()
+        # Need to keep the name only of the concat feature
+        json['concat_feature'] = json['concat_feature']['name']
+        return json
+
     @property
     def learning_category(self) -> LearningCategory:
         # Should be the learning category of the type of the source feature
@@ -42,3 +49,9 @@ class FeatureConcat(FeatureWithBaseFeature):
                 f'The concat feature {self.concat_feature.name} of a FeatureRatio should be a string. ' +
                 f'Got {self.concat_feature.type} '
             )
+
+    @classmethod
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List['Feature'], pkl: Any) -> 'FeatureConcat':
+        n, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
+        cf = [f for f in embedded_features if f.name == fields['concat_feature']][0]
+        return FeatureConcat(n, tp, fb, cf)

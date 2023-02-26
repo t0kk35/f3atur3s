@@ -39,7 +39,7 @@ class FeatureBin(FeatureWithBaseFeature, FeatureCategorical):
         return self.bins is not None
 
     @classmethod
-    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureBin':
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List[Feature], pkl: Any) -> 'FeatureBin':
         name, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
         nb = fields['number_of_bins']
         st = fields['scale_type']

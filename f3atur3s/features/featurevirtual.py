@@ -3,6 +3,7 @@ Definition of the virtual feature. It is a feature with an identity problem
 (c) 2023 tsm
 """
 from dataclasses import dataclass
+from typing import Dict, Any, List
 
 from ..common.typechecking import enforce_types
 from ..common.feature import Feature
@@ -26,3 +27,8 @@ class FeatureVirtual(Feature):
     def learning_category(self) -> LearningCategory:
         # Virtual features are never used for learning. No matter what their type is.
         return LEARNING_CATEGORY_NONE
+
+    @classmethod
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List['Feature'], pkl: Any) -> 'FeatureVirtual':
+        name, tp = cls.extract_dict(fields, embedded_features)
+        return FeatureVirtual(name, tp)

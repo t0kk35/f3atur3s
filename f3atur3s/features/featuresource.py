@@ -36,7 +36,7 @@ class FeatureSource(Feature):
         return self.type.learning_category
 
     @classmethod
-    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureSource':
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List[Feature], pkl: Any) -> 'FeatureSource':
         name, tp = cls.extract_dict(fields, embedded_features)
         fc = fields['format_code']
         df = fields['default']

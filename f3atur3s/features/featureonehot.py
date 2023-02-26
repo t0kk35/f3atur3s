@@ -42,7 +42,7 @@ class FeatureOneHot(FeatureExpander):
         return LEARNING_CATEGORY_BINARY
 
     @classmethod
-    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureOneHot':
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List[Feature], pkl: Any) -> 'FeatureOneHot':
         name, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
         oh = FeatureOneHot(name, tp, fb)
         oh.expand_names = fields['expand_names']

@@ -2,7 +2,9 @@
 Unit Tests for FeatureVirtual Creation
 (c) 2023 tsm
 """
+import os
 import unittest
+import shutil
 import f3atur3s as ft
 
 
@@ -29,6 +31,41 @@ class TestFeatureVirtual(unittest.TestCase):
         self.assertEqual(v1, v2, f'Should have been equal')
         self.assertNotEqual(v1, v3, f'Should have been not equal')
         self.assertNotEqual(v1, v4, f'Should not have been equal. Different Type')
+
+
+class TestFeatureVirtualSaveLoad(unittest.TestCase):
+    def test_save_base(self):
+        save_file = './save-virtual-base'
+        shutil.rmtree(save_file, ignore_errors=True)
+        name = 'test'
+        td_name = 'base'
+        f_type = ft.FEATURE_TYPE_STRING
+        f = ft.FeatureVirtual(name, f_type)
+        td = ft.TensorDefinition(td_name, [f])
+        ft.TensorDefinitionSaver.save(td, save_file)
+        self.assertTrue(os.path.exists(save_file), f'File does not exist {save_file}.')
+        self.assertTrue(os.path.isdir(save_file), f'{save_file} does not seem to be a directory.')
+        self.assertTrue(os.path.exists(os.path.join(save_file, f'tensor.json')), f'Did not find tensor.json')
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features')), f'Not <features> directory in {save_file}')
+        self.assertTrue(os.path.isdir(os.path.join(save_file, 'features')), f'<features> is not a directory')
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features', f'{name}.json')), f'No {name}.json found')
+        self.assertTrue(os.path.isfile(os.path.join(save_file, 'features', f'{name}.json')), f'No {name}.json found')
+        shutil.rmtree(save_file, ignore_errors=True)
+
+    def test_load_base(self):
+        save_file = './load-virtual-base'
+        shutil.rmtree(save_file, ignore_errors=True)
+        f_type = ft.FEATURE_TYPE_STRING
+        f = ft.FeatureVirtual('test', f_type)
+        td = ft.TensorDefinition('base', [f])
+        ft.TensorDefinitionSaver.save(td, save_file)
+        td_new = ft.TensorDefinitionLoader.load(save_file)
+        self.assertEqual(td_new.name, td.name, f'Names not equal {td_new.name} {td.name}')
+        self.assertEqual(td_new.inference_ready, td.inference_ready, f'Inference state not equal')
+        self.assertListEqual(td_new.learning_categories, td.learning_categories, f'Learning Cat not equal')
+        self.assertEqual(td_new.features[0], td.features[0], 'Main Feature not the same')
+        self.assertListEqual(td_new.embedded_features, td.embedded_features, f'Embedded features not the same')
+        shutil.rmtree(save_file, ignore_errors=True)
 
 
 def main():

@@ -33,7 +33,7 @@ class FeatureIndex(FeatureWithBaseFeature, FeatureCategorical):
         return self.dictionary is not None
 
     @classmethod
-    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureIndex':
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List[Feature], pkl: Any) -> 'FeatureIndex':
         name, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
         fi = FeatureIndex(name, tp, fb)
         fi.dictionary = fields['dictionary']

@@ -3,9 +3,10 @@ Definition of the Standardizing Normalizer feature. It is a feature directly fou
 (c) 2023 tsm
 """
 from dataclasses import dataclass
+from typing import Any, Dict, List
 
 from ..common.typechecking import enforce_types
-from ..common.feature import FeatureNormalizeLogBase
+from ..common.feature import Feature, FeatureNormalizeLogBase
 
 
 @enforce_types
@@ -27,3 +28,9 @@ class FeatureNormalizeStandard(FeatureNormalizeLogBase):
     @property
     def inference_ready(self) -> bool:
         return self.mean is not None and self.stddev is not None
+
+    @classmethod
+    def create_from_save(
+            cls, fields: Dict[str, Any], embedded_features: List['Feature'], pkl: Any) -> 'FeatureNormalizeStandard':
+        n, tp, fb, lg, dt = FeatureNormalizeLogBase.extract_dict(fields, embedded_features)
+        return FeatureNormalizeStandard(n, tp, fb, lg, dt, fields['mean'], fields['stddev'])

@@ -115,7 +115,7 @@ class Feature(ABC):
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, fields: Dict[str, Any], embedded_features: List['Feature']) -> 'Feature':
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List['Feature'], pkl: Any) -> 'Feature':
         pass
 
     @classmethod
@@ -294,6 +294,13 @@ class FeatureNormalize(FeatureWithBaseFeature, ABC):
 class FeatureNormalizeLogBase(FeatureNormalize, ABC):
     log_base: Optional[str] = None
     delta: float = 1e-2
+
+    @classmethod
+    def extract_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> Tuple[Any, ...]:
+        names = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
+        lg = fields['log_base']
+        dt = fields['delta']
+        return names + (lg, dt)
 
     def log_base_valid(self):
         if self.log_base is not None and self.log_base not in self.valid_bases():

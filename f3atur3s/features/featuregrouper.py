@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from functools import total_ordering
 from datetime import timedelta, datetime
-from typing import Optional
+from typing import Optional, Dict, Any, List
 
 from ..common.typechecking import enforce_types
 from ..common.feature import Feature, FeatureWithBaseFeature
@@ -97,6 +97,19 @@ TIME_PERIODS = [
     TIME_PERIOD_MONTH
 ]
 
+All_TIME_PERIODS = {
+    t.key: t for t in TIME_PERIODS
+}
+
+
+class TimePeriodHelper:
+    @classmethod
+    def get_time_period(cls, key: int) -> TimePeriod:
+        try:
+            return All_TIME_PERIODS[key]
+        except KeyError:
+            raise FeatureDefinitionException(f'Could not find TimePeriod with key <{key}>')
+
 
 @enforce_types
 @dataclass(frozen=True, order=True)
@@ -112,6 +125,28 @@ AGGREGATOR_MIN = Aggregator(2, 'Minimum', 'min')
 AGGREGATOR_MAX = Aggregator(3, 'Maximum', 'max')
 AGGREGATOR_AVG = Aggregator(4, 'Average', 'mean')
 AGGREGATOR_STDDEV = Aggregator(5, 'Standard Deviation', 'std')
+
+AGGREGATORS = [
+    AGGREGATOR_SUM,
+    AGGREGATOR_COUNT,
+    AGGREGATOR_MIN,
+    AGGREGATOR_MAX,
+    AGGREGATOR_AVG,
+    AGGREGATOR_STDDEV
+]
+
+ALL_AGGREGATORS = {
+    a.key: a for a in AGGREGATORS
+}
+
+
+class AggregatorHelper:
+    @classmethod
+    def get_aggregator(cls, key: int) -> Aggregator:
+        try:
+            return ALL_AGGREGATORS[key]
+        except KeyError:
+            raise FeatureDefinitionException(f'Could not find Aggregator with key <{key}>')
 
 
 @enforce_types
@@ -135,6 +170,17 @@ class FeatureGrouper(FeatureWithBaseFeature):
             eb.extend(self.filter_feature.embedded_features)
         self.embedded_features = list(set(eb))
 
+    def __dict__(self) -> Dict[str, Any]:
+        json = super().__dict__()
+        # Just need the name of the group_feature
+        json['group_feature'] = json['group_feature']['name']
+        # Just need the name of the filter_feature
+        if 'filter_feature' in json:
+            ff = json['filter_feature']
+            if ff is not None:
+                json['filter_feature'] = ff['name']
+        return json
+
     @property
     def inference_ready(self) -> bool:
         # This feature is inference ready if all its embedded features are ready for inference.
@@ -143,3 +189,14 @@ class FeatureGrouper(FeatureWithBaseFeature):
     @property
     def learning_category(self) -> LearningCategory:
         return self.type.learning_category
+
+    @classmethod
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List['Feature'], pkl: Any) -> 'FeatureGrouper':
+        name, ty, fb = cls.extract_dict(fields, embedded_features)
+        fg = [f for f in embedded_features if f.name == fields['group_feature']][0]
+        ff = [f for f in embedded_features if f.name == fields['filter_feature']]
+        ff = ff[0] if len(ff) > 0 else None
+        tp = TimePeriodHelper.get_time_period(fields['time_period']['key'])
+        tw = fields['time_window']
+        agg = AggregatorHelper.get_aggregator(fields['aggregator']['key'])
+        return FeatureGrouper(name, ty, fb, fg, ff, tp, tw, agg)

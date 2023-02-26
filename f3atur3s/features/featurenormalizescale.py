@@ -3,9 +3,10 @@ Definition of the Scaling Normalizer feature. It is a feature directly found in 
 (c) 2023 tsm
 """
 from dataclasses import dataclass
+from typing import Dict, Any, List
 
 from ..common.typechecking import enforce_types
-from ..common.feature import FeatureNormalizeLogBase
+from ..common.feature import FeatureNormalizeLogBase, FeatureWithBaseFeature
 
 
 @enforce_types
@@ -27,3 +28,9 @@ class FeatureNormalizeScale(FeatureNormalizeLogBase):
     @property
     def inference_ready(self) -> bool:
         return self.minimum is not None and self.maximum is not None
+
+    @classmethod
+    def create_from_save(
+            cls, fields: Dict[str, Any], embedded_features: List['Feature'], pkl: Any) -> 'FeatureNormalizeScale':
+        n, tp, fb, lg, dt = FeatureNormalizeLogBase.extract_dict(fields, embedded_features)
+        return FeatureNormalizeScale(n, tp, fb, lg, dt, fields['minimum'], fields['maximum'])

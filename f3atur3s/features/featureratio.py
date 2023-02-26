@@ -55,7 +55,7 @@ class FeatureRatio(FeatureWithBaseFeature):
             )
 
     @classmethod
-    def from_dict(cls, fields: Dict[str, Any], embedded_features: List[Feature]) -> 'FeatureRatio':
+    def create_from_save(cls, fields: Dict[str, Any], embedded_features: List[Feature], pkl: Any) -> 'FeatureRatio':
         name, tp, fb = FeatureWithBaseFeature.extract_dict(fields, embedded_features)
         fd = [f for f in embedded_features if f.name == fields['denominator_feature']]
         return FeatureRatio(name, tp, fb, fd[0])

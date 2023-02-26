@@ -5,11 +5,13 @@ Helper Class for the saving and loading TensorDefinition objects
 import importlib
 import json
 import os
+import pickle
 import json as js
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from ..common.feature import Feature
+from ..common.featuresave import FeatureWithPickle
 from ..common.exception import TensorDefinitionSaverException, TensorDefinitionLoaderException
 from ..common.exception import TensorDefinitionException
 from .tensordefinition import TensorDefinition
@@ -58,6 +60,9 @@ class TensorDefinitionSaver:
         for f in to_save_features:
             with open(os.path.join(directory, FEATURE_DIR, f'{f.name}.json'), 'w') as f_file:
                 json.dump(f.__dict__(), f_file, indent=4)
+            if isinstance(f, FeatureWithPickle):
+                with open(os.path.join(directory, FEATURE_DIR, f'{f.name}.pkl'), 'wb') as p_file:
+                    pickle.dump(f.get_pickle(), p_file)
 
 
 class TensorDefinitionLoader:
@@ -97,24 +102,32 @@ class TensorDefinitionLoader:
         to_read_features: List[Dict] = []
         read_features: List[Dict] = []
         built_features: List[Feature] = []
+        pickle_dict: Dict[str, Any] = {}
 
-        # Read all files with *.json
+        # Read all files with *.json. And see if there is a pickle file
         files = Path(os.path.join(directory, FEATURE_DIR)).glob('*.json')
         for file in files:
             with open(file) as j_file:
-                to_read_features.append(json.load(j_file))
+                f = json.load(j_file)
+                name = f['name']
+                to_read_features.append(f)
+                if os.path.exists(os.path.join(directory, FEATURE_DIR, f'{name}.pkl')):
+                    with open(os.path.join(directory, FEATURE_DIR, f'{name}.pkl'), 'rb') as p_file:
+                        pickle_dict[name] = pickle.load(p_file)
 
         i = 0
         while len(to_read_features) > 0:
             if i > 20:
                 raise TensorDefinitionLoaderException(
-                    f'Exiting. Did more that {i} iterations trying to load features from {directory}'+
+                    f'Exiting. Did more that {i} iterations trying to load features from {directory}' +
                     f'Potential endless loop.'
                 )
             read_names = [f['name'] for f in read_features]
             ready_to_read = [f for f in to_read_features if all(ef in read_names for ef in f['embedded_features'])]
             for f in ready_to_read:
-                built_features.append(TensorDefinitionLoader._build_feature(f, built_features))
+                built_features.append(
+                    TensorDefinitionLoader._build_feature(f, built_features, pickle_dict.get(f['name'], None))
+                )
             read_features.extend(ready_to_read)
             to_read_features = [f for f in to_read_features if f not in ready_to_read]
             i = i+1
@@ -122,14 +135,14 @@ class TensorDefinitionLoader:
         return built_features
 
     @staticmethod
-    def _build_feature(f_dict: Dict, built_features: List[Feature]) -> Feature:
+    def _build_feature(f_dict: Dict, built_features: List[Feature], pkl: Any) -> Feature:
         # Create a class instance. This will create an instance of Feature.
         f_class = getattr(importlib.import_module("f3atur3s"), f_dict['class'])
         if not issubclass(f_class, Feature):
             raise TensorDefinitionLoaderException(f'{f_class.__name__} is not an instance of Feature. Can not load')
-        if not hasattr(f_class, 'from_dict') or not callable(getattr(f_class, 'from_dict')):
-            raise TensorDefinitionLoaderException(f'{f_class.__name__} does not have a <from_dict> class method')
+        if not hasattr(f_class, 'create_from_save') or not callable(getattr(f_class, 'create_from_save')):
+            raise TensorDefinitionLoaderException(f'{f_class.__name__} does not have a <create_from_save> class method')
 
-        func = getattr(f_class, 'from_dict')
+        func = getattr(f_class, 'create_from_save')
         emb = [f for f in built_features if f.name in f_dict['embedded_features']]
-        return func(f_dict, emb)
+        return func(f_dict, emb, pkl)

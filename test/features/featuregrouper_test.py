@@ -2,7 +2,9 @@
 Unit Tests for FeatureGrouper Creation
 (c) 2023 tsm
 """
+import os
 import unittest
+import shutil
 import f3atur3s as ft
 
 
@@ -106,6 +108,61 @@ class TestFeatureGrouper(unittest.TestCase):
         self.assertNotEqual(fg_1, fg_6, f'Should not have been equal. Different Time Period')
         self.assertNotEqual(fg_1, fg_7, f'Should not have been equal. Different Time Window')
         self.assertNotEqual(fg_1, fg_8, f'Should not have been equal. Different Aggregator')
+
+
+class TestFeatureConcatSaveLoad(unittest.TestCase):
+    def test_save_base(self):
+        save_file = './save-grouper-base'
+        shutil.rmtree(save_file, ignore_errors=True)
+        name = 'test'
+        a_name = 'amount'
+        s_name = 'source'
+        f_type = ft.FEATURE_TYPE_FLOAT
+        fa = ft.FeatureSource(a_name, ft.FEATURE_TYPE_FLOAT)
+        fs = ft.FeatureSource(s_name, ft.FEATURE_TYPE_STRING)
+        tp = ft.TIME_PERIOD_DAY
+        tw = 3
+        ag = ft.AGGREGATOR_COUNT
+        f = ft.FeatureGrouper(name, f_type, fa, fs, None, tp, tw, ag)
+        td_name = 'base'
+        td = ft.TensorDefinition(td_name, [f])
+        ft.TensorDefinitionSaver.save(td, save_file)
+        self.assertTrue(os.path.exists(save_file), f'File does not exist {save_file}.')
+        self.assertTrue(os.path.isdir(save_file), f'{save_file} does not seem to be a directory.')
+        self.assertTrue(os.path.exists(os.path.join(save_file, f'tensor.json')), f'Did not find tensor.json')
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features')), f'Not <features> directory in {save_file}')
+        self.assertTrue(os.path.isdir(os.path.join(save_file, 'features')), f'<features> is not a directory')
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features', f'{name}.json')), f'No {name}.json')
+        self.assertTrue(os.path.isfile(os.path.join(save_file, 'features', f'{name}.json')), f'No {name}.json')
+        # We Should have the base feature also
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features', f'{a_name}.json')), f'No {a_name}.json')
+        self.assertTrue(os.path.isfile(os.path.join(save_file, 'features', f'{a_name}.json')), f'No {a_name}.json')
+        # Should have the grouper feature also
+        self.assertTrue(os.path.exists(os.path.join(save_file, 'features', f'{s_name}.json')), f'No {s_name}.json')
+        self.assertTrue(os.path.isfile(os.path.join(save_file, 'features', f'{s_name}.json')), f'No {s_name}.json')
+        shutil.rmtree(save_file, ignore_errors=True)
+
+    def test_load_base(self):
+        save_file = './load-grouper-base'
+        shutil.rmtree(save_file, ignore_errors=True)
+        name = 'test'
+        f_type = ft.FEATURE_TYPE_FLOAT
+        fa = ft.FeatureSource('Amount', ft.FEATURE_TYPE_FLOAT)
+        fs = ft.FeatureSource('Source', ft.FEATURE_TYPE_STRING)
+        tp = ft.TIME_PERIOD_DAY
+        tw = 3
+        ag = ft.AGGREGATOR_COUNT
+        f = ft.FeatureGrouper(name, f_type, fa, fs, None, tp, tw, ag)
+        td_name = 'base'
+        td = ft.TensorDefinition(td_name, [f])
+        ft.TensorDefinitionSaver.save(td, save_file)
+        td_new = ft.TensorDefinitionLoader.load(save_file)
+        self.assertEqual(td_new.name, td.name, f'Names not equal {td_new.name} {td.name}')
+        self.assertEqual(td_new.inference_ready, td.inference_ready, f'Inference state not equal')
+        self.assertListEqual(td_new.learning_categories, td.learning_categories, f'Learning Cat not equal')
+        self.assertEqual(td_new.features[0], td.features[0], 'Main Feature not the same')
+        self.assertListEqual(td_new.embedded_features, td.embedded_features, f'Embedded features not the same')
+        shutil.rmtree(save_file, ignore_errors=True)
 
 
 def main():
