@@ -1,5 +1,5 @@
 """
-Definition of the concatenating feature. It is a feature directly that concatenates 2 string features.
+Definition of the concatenating feature. It is a feature directly that concatenates 2 string dataframebuilder.
 (c) 2023 tsm
 """
 from dataclasses import dataclass
@@ -21,7 +21,7 @@ class FeatureFilter(FeatureExpression):
         self._val_parameters_is_features_list(self.param_features)
         self._val_expression_not_lambda()
         self._val_function_is_callable(self.expression, self.param_features)
-        # The parameters needed to run the function are the embedded features
+        # The parameters needed to run the function are the embedded dataframebuilder
         self.embedded_features.extend(self.param_features)
         for pf in self.param_features:
             self.embedded_features.extend(pf.embedded_features)

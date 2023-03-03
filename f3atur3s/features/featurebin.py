@@ -24,7 +24,7 @@ class FeatureBin(FeatureWithBaseFeature, FeatureCategorical):
     def __post_init__(self):
         self.val_int_type()
         self.val_base_feature_is_float()
-        # By default; return set embedded features to be the base feature.
+        # By default; return set embedded dataframebuilder to be the base feature.
         self.embedded_features = self.get_base_and_base_embedded_features()
 
     def __len__(self):

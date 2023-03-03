@@ -1,5 +1,5 @@
 """
-Definition of the base features types. These are all helper or abstract classes
+Definition of the base dataframebuilder types. These are all helper or abstract classes
 (c) 2023 tsm
 """
 from dataclasses import dataclass, field, asdict
@@ -19,7 +19,7 @@ from .exception import FeatureDefinitionException, not_implemented
 @dataclass(unsafe_hash=True)
 class Feature(ABC):
     """
-    Base Feature class. All features will inherit from this class.
+    Base Feature class. All dataframebuilder will inherit from this class.
     It is an abstract-ish class that only defines the name and type
     """
     name: str
@@ -28,7 +28,7 @@ class Feature(ABC):
 
     def __dict__(self) -> Dict[str, Any]:
         json = asdict(self)
-        # We don't need the full embedded features, just the names.
+        # We don't need the full embedded dataframebuilder, just the names.
         json['embedded_features'] = [e['name'] for e in json['embedded_features']]
         # Don't need the learning category either, its derived
         del json['type']['learning_category']
@@ -105,7 +105,7 @@ class Feature(ABC):
     @abstractmethod
     def inference_ready(self) -> bool:
         """
-        Returns a bool indicating if the feature is ready for inference. Some features need to have been trained
+        Returns a bool indicating if the feature is ready for inference. Some dataframebuilder need to have been trained
         first or loaded. They need to know the inference attributes they will need to build the feature.
 
         Returns:
@@ -127,7 +127,7 @@ class Feature(ABC):
 
 class FeatureCategorical(Feature, ABC):
     """
-    Placeholder for features that are categorical in nature. They implement an additional __len__ method which
+    Placeholder for dataframebuilder that are categorical in nature. They implement an additional __len__ method which
     will be used in embedding layers.
     """
     @abstractmethod
@@ -147,8 +147,8 @@ class FeatureCategorical(Feature, ABC):
 @dataclass(unsafe_hash=True)
 class FeatureWithBaseFeature(Feature, ABC):
     """
-    Abstract class for features that have a base feature. These are typically features that are based off of another
-    feature. There's a bunch of derived features that will have a base feature.
+    Abstract class for dataframebuilder that have a base feature. These are typically dataframebuilder that are based off of another
+    feature. There's a bunch of derived dataframebuilder that will have a base feature.
     """
     base_feature: Feature
 
@@ -229,10 +229,10 @@ class FeatureWithBaseFeature(Feature, ABC):
 
     def get_base_and_base_embedded_features(self) -> List[Feature]:
         """
-        Returns the base_feature + all features embedded in the base_feature.
+        Returns the base_feature + all dataframebuilder embedded in the base_feature.
 
         Returns:
-            A list of features.
+            A list of dataframebuilder.
         """
         return list(set([self.base_feature] + self.base_feature.embedded_features))
 
@@ -241,15 +241,15 @@ class FeatureWithBaseFeature(Feature, ABC):
 @dataclass(unsafe_hash=True)
 class FeatureExpander(FeatureWithBaseFeature, ABC):
     """
-    Base class for expander features. Expander features expand when they are built. One feature in an input
-    can turn into multiple features in output. For instance a one_hot encoded feature.
+    Base class for expander dataframebuilder. Expander dataframebuilder expand when they are built. One feature in an input
+    can turn into multiple dataframebuilder in output. For instance a one_hot encoded feature.
     """
     expand_names: List[str] = field(default=None, init=False, hash=False)
 
     @abstractmethod
     def expand(self) -> List[Feature]:
         """
-        Expand the feature. This will return a list of features that will be built when the expander feature is
+        Expand the feature. This will return a list of dataframebuilder that will be built when the expander feature is
         generated
 
         Returns:
@@ -278,7 +278,7 @@ class FeatureLabel(FeatureWithBaseFeature, ABC):
 @dataclass
 class FeatureNormalize(FeatureWithBaseFeature, ABC):
     """
-    Base class for features with normalizing logic
+    Base class for dataframebuilder with normalizing logic
     """
     def __post_init__(self):
         self.val_float_type()
@@ -312,3 +312,9 @@ class FeatureNormalizeLogBase(FeatureNormalize, ABC):
     @staticmethod
     def valid_bases() -> List[str]:
         return ['e', '10', '2']
+
+
+@enforce_types
+@dataclass
+class FeatureSeriesBased(Feature, ABC):
+    pass

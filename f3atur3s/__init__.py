@@ -32,6 +32,7 @@ from .features.featuregrouper import TimePeriod, TIME_PERIOD_DAY, TIME_PERIOD_WE
 from .features.featuregrouper import Aggregator, AGGREGATOR_COUNT, AGGREGATOR_STDDEV, AGGREGATOR_AVG, AGGREGATOR_MAX
 from .features.featuregrouper import AGGREGATOR_MIN, AGGREGATOR_SUM
 from .features.featuregrouper import FeatureGrouper
+from .common.feature import FeatureSeriesBased
 from .features.featureseriesstacked import FeatureSeriesStacked
 from .tensor.featurehelper import FeatureHelper
 from .tensor.tensordefinition import TensorDefinition, TensorDefinitionException

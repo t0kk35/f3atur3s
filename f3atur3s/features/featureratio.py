@@ -1,5 +1,5 @@
 """
-Definition of the Ratio feature. It calculated a ratio between 2 other numerical features.
+Definition of the Ratio feature. It calculated a ratio between 2 other numerical dataframebuilder.
 (c) 2023 tsm
 """
 from dataclasses import dataclass
@@ -25,7 +25,7 @@ class FeatureRatio(FeatureWithBaseFeature):
         self.val_float_type()
         self.val_base_feature_is_numerical()
         self._val_denominator_is_numerical()
-        # Add base and denominator to the embedded features list
+        # Add base and denominator to the embedded dataframebuilder list
         self.embedded_features = self.get_base_and_base_embedded_features()
         self.embedded_features.append(self.denominator_feature)
         self.embedded_features.extend(self.denominator_feature.embedded_features)

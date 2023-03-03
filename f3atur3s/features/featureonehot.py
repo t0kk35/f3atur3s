@@ -17,13 +17,13 @@ from .featurevirtual import FeatureVirtual
 class FeatureOneHot(FeatureExpander):
     """
     A One Hot feature. This will take a base feature and one hot encode it. It will create as many additional
-    virtual features as there are input values. The virtual feature will have a specific name for instance
+    virtual dataframebuilder as there are input values. The virtual feature will have a specific name for instance
     <base_feature>__<input_value>
     """
     def __post_init__(self):
         self.val_int_type()
         self.val_base_feature_is_string_or_integer()
-        # By default, return set embedded features to be the base feature.
+        # By default, return set embedded dataframebuilder to be the base feature.
         self.embedded_features = self.get_base_and_base_embedded_features()
 
     def expand(self) -> List[FeatureVirtual]:

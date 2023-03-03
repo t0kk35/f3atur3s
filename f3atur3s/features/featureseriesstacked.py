@@ -6,13 +6,13 @@ from dataclasses import dataclass, field
 from typing import Dict, Any, List
 
 from ..common.learningcategory import LearningCategory, LEARNING_CATEGORY_NONE
-from ..common.feature import Feature
+from ..common.feature import Feature, FeatureSeriesBased
 from ..common.typechecking import enforce_types
 
 
 @enforce_types
 @dataclass(unsafe_hash=True)
-class FeatureSeriesStacked(Feature):
+class FeatureSeriesStacked(FeatureSeriesBased):
     """
     Feature that builds out a stacked series.
     """
