@@ -2,8 +2,10 @@
 Import for the main F3ATUR3S module
 (c) tsm 2023
 """
+from .common.featuretype import FeatureType
 from .common.featuretype import FEATURE_TYPE_FLOAT_32, FEATURE_TYPE_FLOAT_64, FEATURE_TYPE_FLOAT
-from .common.featuretype import FEATURE_TYPE_INT_16, FEATURE_TYPE_INT_8
+from .common.featuretype import FEATURE_TYPE_INT_16, FEATURE_TYPE_INT_8, FEATURE_TYPE_INT_32, FEATURE_TYPE_INT_64
+from .common.featuretype import FEATURE_ROOT_TYPE_INT
 from .common.featuretype import FEATURE_TYPE_STRING
 from .common.featuretype import FEATURE_TYPE_BOOL
 from .common.featuretype import FEATURE_TYPE_DATE_TIME

@@ -16,7 +16,7 @@ from ..common.exception import TensorDefinitionSaverException, TensorDefinitionL
 from ..common.exception import TensorDefinitionException
 from .tensordefinition import TensorDefinition
 
-FEATURE_DIR = 'dataframebuilder'
+FEATURE_DIR = 'features'
 TENSOR_JSON_FILE = 'tensor.json'
 
 
@@ -46,7 +46,7 @@ class TensorDefinitionSaver:
         td_dict = {
             'name': td.name,
             'rank': rank,
-            'dataframebuilder': [f.name for f in td.features]
+            'features': [f.name for f in td.features]
         }
 
         with open(os.path.join(directory, TENSOR_JSON_FILE), 'w') as j_file:
@@ -54,7 +54,7 @@ class TensorDefinitionSaver:
 
     @staticmethod
     def _write_features_jsons(td: TensorDefinition, directory: str):
-        # Save all the dataframebuilder
+        # Save all the features
         os.makedirs(os.path.join(directory, FEATURE_DIR))
         to_save_features = td.embedded_features
         for f in to_save_features:
@@ -82,23 +82,23 @@ class TensorDefinitionLoader:
         with open(os.path.join(directory, TENSOR_JSON_FILE)) as j_file:
             td_dict = json.load(j_file)
 
-        # Check we have a dataframebuilder directory
+        # Check we have a features directory
         if not os.path.exists(os.path.join(directory, FEATURE_DIR)):
             raise TensorDefinitionLoaderException(f'Can not find {FEATURE_DIR} in directory {directory}')
 
         # Read all the json feature files. This will create all feature, native and embedded.
         all_features = TensorDefinitionLoader._read_features_jsons(directory)
-        # Create TensorDefinition with native dataframebuilder only
-        td = TensorDefinition(td_dict['name'], [f for f in all_features if f.name in td_dict['dataframebuilder']])
+        # Create TensorDefinition with native features only
+        td = TensorDefinition(td_dict['name'], [f for f in all_features if f.name in td_dict['features']])
         return td
 
     @staticmethod
     def _read_features_jsons(directory: str) -> List[Feature]:
-        # Check we have a dataframebuilder directory
+        # Check we have a features directory
         if not os.path.exists(os.path.join(directory, FEATURE_DIR)):
             raise TensorDefinitionLoaderException(f'Can not find {FEATURE_DIR} in directory {directory}')
 
-        # Create all dataframebuilder list
+        # Create all features list
         to_read_features: List[Dict] = []
         read_features: List[Dict] = []
         built_features: List[Feature] = []
@@ -119,7 +119,7 @@ class TensorDefinitionLoader:
         while len(to_read_features) > 0:
             if i > 20:
                 raise TensorDefinitionLoaderException(
-                    f'Exiting. Did more that {i} iterations trying to load dataframebuilder from {directory}' +
+                    f'Exiting. Did more that {i} iterations trying to load features from {directory}' +
                     f'Potential endless loop.'
                 )
             read_names = [f['name'] for f in read_features]

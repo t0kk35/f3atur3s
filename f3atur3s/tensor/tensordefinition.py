@@ -15,12 +15,12 @@ from .featurehelper import FeatureHelper
 
 
 class TensorDefinition:
-    """ A TensorDefinition is a container of dataframebuilder. A set of dataframebuilder can be bundled in a tensor definition. That
+    """ A TensorDefinition is a container of features. A set of features can be bundled in a tensor definition. That
     tensor definition can then be constructed by the engines and used in modelling.
 
     Args:
         name: A name for this tensor definition
-        features: A list of dataframebuilder to group in this feature definition
+        features: A list of features to group in this feature definition
     """
     def _val_rank_set(self):
         if self._rank is None:
@@ -54,13 +54,13 @@ class TensorDefinition:
     def _val_not_empty(self):
         if len(self.features) == 0:
             raise TensorDefinitionException(
-                f'Tensor definition <{self.name} has no dataframebuilder. It is empty. Can not perform action'
+                f'Tensor definition <{self.name} has no features. It is empty. Can not perform action'
             )
 
     def _val_has_numerical_features(self):
         if len(FeatureHelper.filter_feature_type(FeatureTypeNumerical, self.features)) == 0:
             raise TensorDefinitionException(
-                f'Tensor definition <{self.name} has no numerical dataframebuilder. Can not perform action'
+                f'Tensor definition <{self.name} has no numerical features. Can not perform action'
             )
 
     def _val_base_feature_overlap(self):
@@ -69,7 +69,7 @@ class TensorDefinition:
         s = fi.intersection(fo)
         if len(s) != 0:
             raise TensorDefinitionException(
-                f'FeatureIndex and FeatureOneHot should not have the same base dataframebuilder. Overlap <{s}>'
+                f'FeatureIndex and FeatureOneHot should not have the same base features. Overlap <{s}>'
             )
 
     def _val_inference_ready(self, operation: str):
@@ -161,10 +161,10 @@ class TensorDefinition:
     @property
     def features(self) -> List[Feature]:
         """
-        Property that lists all dataframebuilder of this tensor definition
+        Property that lists all features of this tensor definition
 
         Returns:
-             A list of dataframebuilder of the tensor definition
+             A list of features of the tensor definition
         """
         return self._features_list
 
@@ -175,7 +175,7 @@ class TensorDefinition:
         FeatureExpander, the expanded names of the Feature are returned.
 
         Returns:
-            The list names of the dataframebuilder included in this TensorDefinition
+            The list names of the features included in this TensorDefinition
         """
         out = []
         for f in self.features:
@@ -188,11 +188,11 @@ class TensorDefinition:
     @property
     def embedded_features(self) -> List[Feature]:
         """
-        Function which returns all dataframebuilder embedded in the base dataframebuilder + the base dataframebuilder themselves. It effectively
-        returns all dataframebuilder referenced in this Tensor Definition.
+        Function which returns all features embedded in the base features + the base features themselves. It effectively
+        returns all features referenced in this Tensor Definition.
 
         Returns:
-             A list of dataframebuilder embedded in the base dataframebuilder + the base dataframebuilder
+             A list of features embedded in the base features + the base features
         """
         base_features = self._features_list
         embedded_features = [features.embedded_features for features in base_features]
@@ -202,7 +202,7 @@ class TensorDefinition:
     @property
     def inference_ready(self) -> bool:
         """
-        Method that return True if the Tensor is ready for inference. It means  all embedded dataframebuilder are ready fpr
+        Method that return True if the Tensor is ready for inference. It means  all embedded features are ready fpr
         inference, they either have no inference attributes or their inference attributes are set.
 
         Returns:
@@ -244,17 +244,17 @@ class TensorDefinition:
 
     def filter_features(self, category: LearningCategory, expand=False) -> List[Feature]:
         """
-        Filter dataframebuilder in this Tensor Definition according to a Learning category.
+        Filter features in this Tensor Definition according to a Learning category.
         NOTE that with expand 'True', the Tensor Definition must be ready for inference.
 
         Args:
             category: The LearningCategory to filter out.
-            expand: Bool value. True or False indicating if the names of expander dataframebuilder will be expanded. For in
+            expand: Bool value. True or False indicating if the names of expander features will be expanded. For in
             instance with expand = True a 'FeatureOneHot' country will be expanded to country__DE, country__FR etc...
             Default is False. NOTE that with expand 'True', the Tensor Definition must be ready for inference.
 
         Returns:
-             List of dataframebuilder of the specified 'LearningCategory'
+             List of features of the specified 'LearningCategory'
         """
         if expand:
             self._val_inference_ready('filter ' + category.name)
@@ -266,29 +266,29 @@ class TensorDefinition:
 
     def categorical_features(self, expand=False) -> List[Feature]:
         """
-        Return the categorical dataframebuilder in this Tensor Definition.
+        Return the categorical features in this Tensor Definition.
 
         Args:
-            expand: Bool value. True or False indicating if the names of expander dataframebuilder will be expanded. For in
+            expand: Bool value. True or False indicating if the names of expander features will be expanded. For in
             instance with expand = True a 'FeatureOneHot' country will be expanded to country__DE, country__FR etc...
             Default is False
 
         Returns:
-             List of categorical dataframebuilder in this Tensor Definition
+             List of categorical features in this Tensor Definition
         """
         return self.filter_features(LEARNING_CATEGORY_CATEGORICAL, expand)
 
     def binary_features(self, expand=False) -> List[Feature]:
         """
-        Return the binary dataframebuilder in this Tensor Definition
+        Return the binary features in this Tensor Definition
 
         Args:
-            expand: Bool value. True or False indicating if the names of expander dataframebuilder will be expanded. For in
+            expand: Bool value. True or False indicating if the names of expander features will be expanded. For in
             instance with expand = True a 'FeatureOneHot' country will be expanded to country__DE, country__FR etc...
             Default is False
 
         Returns:
-             List of binary dataframebuilder in this Tensor Definition
+             List of binary features in this Tensor Definition
         """
         return self.filter_features(LEARNING_CATEGORY_BINARY, expand)
 
@@ -297,12 +297,12 @@ class TensorDefinition:
         Return the continuous feature in this Tensor Definition
 
         Args:
-             expand: Bool value. True or False indicating if the names of expander dataframebuilder will be expanded. For in
+             expand: Bool value. True or False indicating if the names of expander features will be expanded. For in
              instance with expand = True a 'FeatureOneHot' country will be expanded to country__DE, country__FR etc...
              Default is False
 
         Returns:
-            List of continuous dataframebuilder in this Tensor Definition
+            List of continuous features in this Tensor Definition
         """
         return self.filter_features(LEARNING_CATEGORY_CONTINUOUS, expand)
 
@@ -311,20 +311,20 @@ class TensorDefinition:
         Return the label feature in this Tensor Definition
 
         Args:
-            expand: Bool value. True or False indicating if the names of expander dataframebuilder will be expanded. For in
+            expand: Bool value. True or False indicating if the names of expander features will be expanded. For in
             instance with expand = True a 'FeatureOneHot' country will be expanded to country__DE, country__FR etc...
             Default is False
 
         Returns:
-             List of label dataframebuilder in this Tensor Definition
+             List of label features in this Tensor Definition
         """
         return self.filter_features(LEARNING_CATEGORY_LABEL, expand)
 
     def features_not_inference_ready(self) -> List[Feature]:
         """
-        List dataframebuilder of this TensorDefinition which are not ready for inference
+        List features of this TensorDefinition which are not ready for inference
 
         Returns:
-             A list of dataframebuilder that returned False to the inference_ready call
+             A list of features that returned False to the inference_ready call
         """
         return [f for f in self.embedded_features if f.inference_ready]

@@ -1,5 +1,5 @@
 """
-Definition of the base dataframebuilder types. These are all helper or abstract classes
+Definition of the base features types. These are all helper or abstract classes
 (c) 2023 tsm
 """
 from dataclasses import dataclass, field, asdict
@@ -8,9 +8,9 @@ from abc import ABC, abstractmethod
 
 from .typechecking import enforce_types
 from .learningcategory import LearningCategory, LEARNING_CATEGORY_CATEGORICAL, LEARNING_CATEGORY_LABEL
-from .learningcategory import LEARNING_CATEGORY_CONTINUOUS
+from .learningcategory import LEARNING_CATEGORY_CONTINUOUS, LEARNING_CATEGORY_NONE
 from .featuretype import FeatureType, FeatureTypeInteger, FeatureTypeFloat, FeatureTypeNumerical, FeatureTypeString
-from .featuretype import FeatureTypeBool
+from .featuretype import FeatureTypeBool, FeatureTypeNumerical
 from .featuretype import FeatureTypeHelper
 from .exception import FeatureDefinitionException, not_implemented
 
@@ -19,7 +19,7 @@ from .exception import FeatureDefinitionException, not_implemented
 @dataclass(unsafe_hash=True)
 class Feature(ABC):
     """
-    Base Feature class. All dataframebuilder will inherit from this class.
+    Base Feature class. All features will inherit from this class.
     It is an abstract-ish class that only defines the name and type
     """
     name: str
@@ -28,7 +28,7 @@ class Feature(ABC):
 
     def __dict__(self) -> Dict[str, Any]:
         json = asdict(self)
-        # We don't need the full embedded dataframebuilder, just the names.
+        # We don't need the full embedded features, just the names.
         json['embedded_features'] = [e['name'] for e in json['embedded_features']]
         # Don't need the learning category either, its derived
         del json['type']['learning_category']
@@ -105,7 +105,7 @@ class Feature(ABC):
     @abstractmethod
     def inference_ready(self) -> bool:
         """
-        Returns a bool indicating if the feature is ready for inference. Some dataframebuilder need to have been trained
+        Returns a bool indicating if the feature is ready for inference. Some features need to have been trained
         first or loaded. They need to know the inference attributes they will need to build the feature.
 
         Returns:
@@ -127,7 +127,7 @@ class Feature(ABC):
 
 class FeatureCategorical(Feature, ABC):
     """
-    Placeholder for dataframebuilder that are categorical in nature. They implement an additional __len__ method which
+    Placeholder for features that are categorical in nature. They implement an additional __len__ method which
     will be used in embedding layers.
     """
     @abstractmethod
@@ -147,8 +147,8 @@ class FeatureCategorical(Feature, ABC):
 @dataclass(unsafe_hash=True)
 class FeatureWithBaseFeature(Feature, ABC):
     """
-    Abstract class for dataframebuilder that have a base feature. These are typically dataframebuilder that are based off of another
-    feature. There's a bunch of derived dataframebuilder that will have a base feature.
+    Abstract class for features that have a base feature. These are typically features that are based off of another
+    feature. There's a bunch of derived features that will have a base feature.
     """
     base_feature: Feature
 
@@ -229,10 +229,10 @@ class FeatureWithBaseFeature(Feature, ABC):
 
     def get_base_and_base_embedded_features(self) -> List[Feature]:
         """
-        Returns the base_feature + all dataframebuilder embedded in the base_feature.
+        Returns the base_feature + all feature embedded in the base_feature.
 
         Returns:
-            A list of dataframebuilder.
+            A list of features.
         """
         return list(set([self.base_feature] + self.base_feature.embedded_features))
 
@@ -241,15 +241,15 @@ class FeatureWithBaseFeature(Feature, ABC):
 @dataclass(unsafe_hash=True)
 class FeatureExpander(FeatureWithBaseFeature, ABC):
     """
-    Base class for expander dataframebuilder. Expander dataframebuilder expand when they are built. One feature in an input
-    can turn into multiple dataframebuilder in output. For instance a one_hot encoded feature.
+    Base class for expander features. Expander features expand when they are built. One feature in an input
+    can turn into multiple features in output. For instance a one_hot encoded feature.
     """
     expand_names: List[str] = field(default=None, init=False, hash=False)
 
     @abstractmethod
     def expand(self) -> List[Feature]:
         """
-        Expand the feature. This will return a list of dataframebuilder that will be built when the expander feature is
+        Expand the feature. This will return a list of features that will be built when the expander feature is
         generated
 
         Returns:
@@ -278,7 +278,7 @@ class FeatureLabel(FeatureWithBaseFeature, ABC):
 @dataclass
 class FeatureNormalize(FeatureWithBaseFeature, ABC):
     """
-    Base class for dataframebuilder with normalizing logic
+    Base class for features with normalizing logic
     """
     def __post_init__(self):
         self.val_float_type()
@@ -317,4 +317,73 @@ class FeatureNormalizeLogBase(FeatureNormalize, ABC):
 @enforce_types
 @dataclass
 class FeatureSeriesBased(Feature, ABC):
-    pass
+    series_features: List[Feature] = field(hash=False)
+
+    def val_same_learning_type(self):
+        """
+        Validation method to check if all features in a list have the same LearningCategory
+
+        Return:
+            None
+
+        Raises:
+            FeatureDefinitionException
+        """
+        lc = list(set([f.learning_category for f in self.series_features]))
+        if len(lc) > 1:
+            raise FeatureDefinitionException(
+                f'Found more than one LearningCategory in the list of features {lc}. This function works with' +
+                f'one LearningCategory only.'
+            )
+
+    def val_learning_category_not_none(self):
+        """
+        Validation method to check that there is no feature that has the LEARNING_CATEGORY_NONE
+
+        Return:
+            None
+
+        Raises:
+            FeatureDefinitionException
+        """
+        lc = list(set([f.learning_category for f in self.series_features]))
+        if LEARNING_CATEGORY_NONE in lc:
+            raise FeatureDefinitionException(
+                f'Found (a) Feature(s) {[f.name for f in features if f.learning_category == LEARNING_CATEGORY_NONE]} ' +
+                f'with LEARNING_CATEGORY_NONE. This function can not process those'
+            )
+
+    def val_same_root_feature_type(self):
+        """
+        Validation method to check that the root type of the features is the same. Sometimes we will want to
+        all have floats or all ints.
+
+        Return:
+            None
+
+        Raises:
+            FeatureDefinitionException
+        """
+        rt = list(set([f.type.root_type for f in self.series_features]))
+        if len(rt) > 1:
+            raise FeatureDefinitionException(
+                f'Found more than one Root Feature Type. {rt}. This procedure can only use similar feature root types'
+            )
+
+    def val_all_series_features_numerical(self):
+        """
+        Validation method to check that the root type of the features is the same. Sometimes we will want to
+        all have floats or all ints.
+
+        Return:
+            None
+
+        Raises:
+            FeatureDefinitionException
+        """
+        if not all([isinstance(f.type, FeatureTypeNumerical) for f in self.series_features]):
+            raise FeatureDefinitionException(
+                f'All Series Features need to be numerical for feature {self.name} ' +
+                f'Found non-numerical features + '
+                f'{[f.name for f in self.series_features if not isinstance(f, FeatureTypeNumerical)]}'
+            )

@@ -18,12 +18,18 @@ class FeatureSeriesStacked(FeatureSeriesBased):
     """
     series_depth: int
     key_feature: Feature
-    series_features: List[Feature] = field(default_factory=list, hash=False)
 
     def __post_init__(self):
         # Do validation
+        self.val_all_series_features_numerical()
+        self.val_same_learning_type()
+        self.val_learning_category_not_none()
+        self.val_same_root_feature_type()
+        # Set the Learning category
+        self._learning_category = [f.learning_category for f in self.series_features][0]
+        # Create Embedded Features
         self.embedded_features.extend(self.series_features)
-        for sf in self.param_features:
+        for sf in self.series_features:
             self.embedded_features.extend(sf.embedded_features)
         self.embedded_features = list(set(self.embedded_features))
 
@@ -44,4 +50,4 @@ class FeatureSeriesStacked(FeatureSeriesBased):
 
     @property
     def learning_category(self) -> LearningCategory:
-        return LEARNING_CATEGORY_NONE
+        return self._learning_category
