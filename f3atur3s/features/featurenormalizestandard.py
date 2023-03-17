@@ -22,7 +22,7 @@ class FeatureNormalizeStandard(FeatureNormalizeLogBase):
         self.val_float_type()
         self.val_base_feature_is_float()
         self.log_base_valid()
-        # By default, return set embedded dataframebuilder to be the base feature.
+        # By default, return set embedded Features to be the base feature.
         self.embedded_features = self.get_base_and_base_embedded_features()
 
     @property

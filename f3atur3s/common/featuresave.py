@@ -8,5 +8,9 @@ from typing import Any
 
 class FeatureWithPickle(ABC):
     @abstractmethod
+    def name(self)-> str:
+        pass
+
+    @abstractmethod
     def get_pickle(self) -> Any:
         pass

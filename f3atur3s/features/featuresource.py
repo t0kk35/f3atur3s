@@ -7,7 +7,6 @@ from typing import Optional, Union, Dict, Any, List
 
 from ..common.typechecking import enforce_types
 from ..common.exception import FeatureDefinitionException
-from ..common.featuretype import FeatureTypeHelper
 from ..common.feature import Feature
 from ..common.featuretype import FeatureTypeTimeBased
 from ..common.learningcategory import LearningCategory

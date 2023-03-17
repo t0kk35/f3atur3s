@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Dict, Any, List
 
 from ..common.typechecking import enforce_types
-from ..common.feature import FeatureWithBaseFeature, Feature, LearningCategory, FeatureTypeString
+from ..common.feature import Feature, LearningCategory, FeatureTypeString
 from ..common.feature import FeatureDefinitionException, FeatureWithBaseFeature
 
 
@@ -14,7 +14,7 @@ from ..common.feature import FeatureDefinitionException, FeatureWithBaseFeature
 @dataclass(unsafe_hash=True, order=True)
 class FeatureConcat(FeatureWithBaseFeature):
     """
-    Feature to concatenate 2 dataframebuilder. Both feature must be string type, the result will be a string
+    Feature to concatenate 2 features. Both feature must be string type, the result will be a string
     """
     concat_feature: Feature
 
@@ -22,7 +22,7 @@ class FeatureConcat(FeatureWithBaseFeature):
         self.val_string_type()
         self.val_base_feature_is_string()
         self._val_concat_feature_is_string()
-        # Add base and concat to the embedded dataframebuilder list
+        # Add base and concat to the embedded features list
         self.embedded_features = self.get_base_and_base_embedded_features()
         self.embedded_features.append(self.concat_feature)
         self.embedded_features.extend(self.concat_feature.embedded_features)

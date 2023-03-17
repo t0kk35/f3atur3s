@@ -6,7 +6,6 @@ import importlib
 import json
 import os
 import pickle
-import json as js
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -88,8 +87,11 @@ class TensorDefinitionLoader:
 
         # Read all the json feature files. This will create all feature, native and embedded.
         all_features = TensorDefinitionLoader._read_features_jsons(directory)
-        # Create TensorDefinition with native features only
-        td = TensorDefinition(td_dict['name'], [f for f in all_features if f.name in td_dict['features']])
+        # Create TensorDefinition with native features only, in the original order
+        load_features = [f for f in all_features if f.name in td_dict['features']]
+        orig_index: Dict[str, int] = {f: i for i, f in enumerate(td_dict['features'])}
+        load_order = [orig_index.get(f.name, None) for f in all_features]
+        td = TensorDefinition(td_dict['name'], [load_features[lo] for lo in load_order if lo is not None])
         return td
 
     @staticmethod

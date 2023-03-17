@@ -9,6 +9,7 @@ from datetime import timedelta, datetime
 from typing import Optional, Dict, Any, List
 
 from ..common.typechecking import enforce_types
+from ..common.exception import FeatureDefinitionException
 from ..common.feature import Feature, FeatureWithBaseFeature
 from ..common.learningcategory import LearningCategory
 from .featurefilter import FeatureFilter
@@ -162,7 +163,7 @@ class FeatureGrouper(FeatureWithBaseFeature):
         # Make sure the type float based.
         self.val_float_type()
         self.val_base_feature_is_float()
-        # Embedded dataframebuilder are the base_feature, the group feature, the filter (if set) + their embedded dataframebuilder.
+        # Embedded features are the base_feature, the group feature, the filter (if set) + their embedded features.
         eb = [self.group_feature, self.base_feature]
         eb.extend(self.group_feature.embedded_features + self.base_feature.embedded_features)
         if self.filter_feature is not None:
@@ -183,7 +184,7 @@ class FeatureGrouper(FeatureWithBaseFeature):
 
     @property
     def inference_ready(self) -> bool:
-        # This feature is inference ready if all its embedded dataframebuilder are ready for inference.
+        # This feature is inference ready if all its embedded features are ready for inference.
         return all([f.inference_ready for f in self.embedded_features])
 
     @property

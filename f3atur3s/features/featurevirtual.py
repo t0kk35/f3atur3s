@@ -16,7 +16,7 @@ class FeatureVirtual(Feature):
     """
     A placeholder feature without actual definition. Sometimes we might want to refer to a feature that is not
     an actual feature. Fluffy, true, this is a feature without actually being one.
-    Virtual dataframebuilder should be created by providing a name and type
+    Virtual features should be created by providing a name and type
     """
     @property
     def inference_ready(self) -> bool:
@@ -25,7 +25,7 @@ class FeatureVirtual(Feature):
 
     @property
     def learning_category(self) -> LearningCategory:
-        # Virtual dataframebuilder are never used for learning. No matter what their type is.
+        # Virtual features are never used for learning. No matter what their type is.
         return LEARNING_CATEGORY_NONE
 
     @classmethod

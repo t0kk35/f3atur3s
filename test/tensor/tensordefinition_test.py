@@ -1,5 +1,5 @@
 """
-Unit Tests for FeatureBin Creation
+Unit Tests for TensorDefinition Creation
 (c) 2023 tsm
 """
 import unittest
@@ -65,13 +65,11 @@ class TestTensorCreate(unittest.TestCase):
         f5 = ft.FeatureSource('test-feature-5', ft.FEATURE_TYPE_FLOAT)
         f6 = ft.FeatureNormalizeScale('test-feature-6', ft.FEATURE_TYPE_FLOAT, f5)
         f7 = ft.FeatureNormalizeStandard('test-feature-7', ft.FEATURE_TYPE_FLOAT, f5)
-        f8 = ft.FeatureLabelBinary('test-feature-8', ft.FEATURE_TYPE_INT_8, f2)
-        t = ft.TensorDefinition(name_t, [f1, f2, f3, f4, f5, f6, f7, f8])
-        self.assertEqual(len(t.learning_categories), 4, f'Should be 4 categories. Got {len(t.learning_categories)}')
+        t = ft.TensorDefinition(name_t, [f1, f2, f3, f4, f5, f6, f7])
+        self.assertEqual(len(t.learning_categories), 3, f'Should be 3 categories. Got {len(t.learning_categories)}')
         self.assertListEqual(t.categorical_features(), [f2])
         self.assertListEqual(t.binary_features(), [f4])
         self.assertListEqual(t.continuous_features(), [f5, f6, f7])
-        self.assertListEqual(t.label_features(), [f8])
         # Should fail because the Tensor Definition is ready for inference.
         with self.assertRaises(ft.TensorDefinitionException):
             t.categorical_features(True)
@@ -91,3 +89,11 @@ class TestTensorCreate(unittest.TestCase):
         t.remove(f3)
         with self.assertRaises(ft.TensorDefinitionException):
             _ = t.highest_precision_feature
+
+
+def main():
+    unittest.main()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,5 +1,5 @@
 """
-Definition of the concatenating feature. It is a feature directly that concatenates 2 string dataframebuilder.
+Definition of the concatenating feature. It is a feature directly that concatenates 2 string features.
 (c) 2023 tsm
 """
 from dataclasses import dataclass, field
@@ -16,7 +16,7 @@ from ..common.featuresave import FeatureWithPickle
 @dataclass(unsafe_hash=True)
 class _ExpressionBased(Feature, ABC):
     """
-    Base class for dataframebuilder that use and expression
+    Base class for features that use and expression
     """
     expression: Callable = field(hash=False)
     param_features: List[Feature] = field(default_factory=list, hash=False)
@@ -42,7 +42,7 @@ class _ExpressionBased(Feature, ABC):
         expression_signature = signature(expression)
         if len(expression_signature.parameters) != len(param_features):
             raise FeatureDefinitionException(
-                f'Number of arguments of function and dataframebuilder do not match '
+                f'Number of arguments of function and features do not match '
                 f'[{len(expression_signature.parameters)}]  [{len(param_features)}]'
             )
 
@@ -78,8 +78,8 @@ class _ExpressionBased(Feature, ABC):
 @dataclass(unsafe_hash=True)
 class FeatureExpression(_ExpressionBased, FeatureWithPickle):
     """
-    Derived Feature. This is a Feature that will be built off of other dataframebuilder using a function. It can be used
-    to perform all sorts of custom operations on other dataframebuilder, such as adding, formatting, calculating ratio's etc...
+    Derived Feature. This is a Feature that will be built off of other features using a function. It can be used
+    to perform all sorts of custom operations on other feature, such as adding, formatting, calculating ratio's etc...
 
     The function passed to as expression must be available in the main Python Context
     """
@@ -87,7 +87,7 @@ class FeatureExpression(_ExpressionBased, FeatureWithPickle):
         # Run post init validation
         self._val_parameters_is_features_list(self.param_features)
         self._val_function_is_callable(self.expression, self.param_features)
-        # The parameters needed to run the function are the embedded dataframebuilder
+        # The parameters needed to run the function are the embedded features
         self.embedded_features.extend(self.param_features)
         for pf in self.param_features:
             self.embedded_features.extend(pf.embedded_features)
@@ -95,7 +95,7 @@ class FeatureExpression(_ExpressionBased, FeatureWithPickle):
 
     def __dict__(self) -> Dict[str, Any]:
         json = super().__dict__()
-        # We only need the names of the parameter dataframebuilder
+        # We only need the names of the parameter features
         json['param_features'] = [f['name'] for f in json['param_features']]
         # Need to remove the expression, that will be pickled
         del json['expression']
@@ -120,7 +120,7 @@ class FeatureExpressionSeries(_ExpressionBased, FeatureWithPickle):
         self._val_expression_not_lambda()
         self._val_parameters_is_features_list(self.param_features)
         self._val_function_is_callable(self.expression, self.param_features)
-        # The parameters needed to run the function are the embedded dataframebuilder
+        # The parameters needed to run the function are the embedded features
         self.embedded_features.extend(self.param_features)
         for pf in self.param_features:
             self.embedded_features.extend(pf.embedded_features)
@@ -128,7 +128,7 @@ class FeatureExpressionSeries(_ExpressionBased, FeatureWithPickle):
 
     def __dict__(self) -> Dict[str, Any]:
         json = super().__dict__()
-        # We only need the names of the parameter dataframebuilder
+        # We only need the names of the parameter features
         json['param_features'] = [f['name'] for f in json['param_features']]
         # Need to remove the expression, that will be pickled
         del json['expression']

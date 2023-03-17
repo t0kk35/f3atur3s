@@ -21,7 +21,7 @@ class FeatureIndex(FeatureWithBaseFeature, FeatureCategorical):
     def __post_init__(self):
         self.val_int_type()
         self.val_base_feature_is_string_or_integer()
-        # By default, return set embedded dataframebuilder to be the base feature.
+        # By default, return set embedded features to be the base feature.
         self.embedded_features.append(self.base_feature)
         self.embedded_features.extend(self.base_feature.embedded_features)
 
