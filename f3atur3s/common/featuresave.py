@@ -5,12 +5,10 @@ Definition of the save types. These are needed to save certain classes
 from abc import ABC, abstractmethod
 from typing import Any
 
+from .feature import Feature
 
-class FeatureWithPickle(ABC):
-    @abstractmethod
-    def name(self)-> str:
-        pass
 
+class FeatureWithPickle(Feature, ABC):
     @abstractmethod
     def get_pickle(self) -> Any:
         pass
