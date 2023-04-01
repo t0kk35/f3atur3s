@@ -10,7 +10,7 @@ from .typechecking import enforce_types
 from .learningcategory import LearningCategory, LEARNING_CATEGORY_CATEGORICAL, LEARNING_CATEGORY_LABEL
 from .learningcategory import LEARNING_CATEGORY_CONTINUOUS, LEARNING_CATEGORY_NONE
 from .featuretype import FeatureType, FeatureTypeInteger, FeatureTypeFloat, FeatureTypeNumerical, FeatureTypeString
-from .featuretype import FeatureTypeBool, FeatureTypeNumerical
+from .featuretype import FeatureTypeBool, FeatureTypeNumerical, FeatureTypeTimeBased
 from .featuretype import FeatureTypeHelper
 from .exception import FeatureDefinitionException, not_implemented
 
@@ -224,6 +224,23 @@ class FeatureWithBaseFeature(Feature, ABC):
         if not isinstance(self.base_feature.type, FeatureTypeNumerical):
             raise FeatureDefinitionException(
                 f'The base feature parameter of a {self.__class__.__name__} must be a numerical type. ' +
+                f'Got [{type(self.base_feature.type)}]'
+            )
+
+    def val_base_feature_is_time_based(self):
+        """
+        Validation method to check if the type of the base feature is of is time based. Will throw a
+        FeatureDefinitionException if the type of the base feature is NOT time based.
+
+        Returns:
+             None
+
+        Raises:
+            FeatureDefinitionException
+        """
+        if not isinstance(self.base_feature.type, FeatureTypeTimeBased):
+            raise FeatureDefinitionException(
+                f'The base feature parameter of a {self.__class__.__name__} must be a time based type. ' +
                 f'Got [{type(self.base_feature.type)}]'
             )
 

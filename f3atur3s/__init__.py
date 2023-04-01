@@ -30,6 +30,7 @@ from .features.featurelabelbinary import FeatureLabelBinary
 from .common.feature import FeatureNormalizeLogBase
 from .features.featurenormalizescale import FeatureNormalizeScale
 from .features.featurenormalizestandard import FeatureNormalizeStandard
+from .features.featuredatetimeformat import FeatureDateTimeFormat
 from .features.featuregrouper import TimePeriod, TIME_PERIOD_DAY, TIME_PERIOD_WEEK, TIME_PERIOD_MONTH, TIME_PERIODS
 from .features.featuregrouper import Aggregator, AGGREGATOR_COUNT, AGGREGATOR_STDDEV, AGGREGATOR_AVG, AGGREGATOR_MAX
 from .features.featuregrouper import AGGREGATOR_MIN, AGGREGATOR_SUM

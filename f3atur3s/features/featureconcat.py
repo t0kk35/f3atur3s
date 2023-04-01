@@ -1,5 +1,5 @@
 """
-Definition of the concatenating feature. It is a feature directly that concatenates 2 string dataframebuilder.
+Definition of the concatenating feature. It is a feature directly that concatenates 2 string features.
 (c) 2023 tsm
 """
 from dataclasses import dataclass
