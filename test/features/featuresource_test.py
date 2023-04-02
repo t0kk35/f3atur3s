@@ -46,6 +46,45 @@ class TestFeatureSource(unittest.TestCase):
         self.assertIsNone(f.format_code, 'Should not have format code')
         self.assertEqual(len(f.embedded_features), 0, 'Should not have embedded features')
 
+    def test_creation_categorical(self):
+        name = 'test'
+        f_type = ft.FEATURE_TYPE_CATEGORICAL
+        default = 'NA'
+        f = ft.FeatureSource(name, f_type, default=default)
+        self.assertIsInstance(f, ft.FeatureSource, f'Unexpected Type {type(f)}')
+        self.assertEqual(f.name, name, f'Feature Name should be {name}')
+        self.assertEqual(f.type, f_type, f'Feature Type should be {f_type}')
+        self.assertEqual(f.default, default, f'Default should be {default}')
+        self.assertIsNone(f.format_code, 'Should not have format code')
+        self.assertEqual(len(f.embedded_features), 0, 'Should not have embedded features')
+        self.assertEqual(f.learning_category, ft.LEARNING_CATEGORY_NONE, f'Categorical should have learning type NONE')
+
+    def test_creation_integer(self):
+        name = 'test'
+        f_type = ft.FEATURE_TYPE_INT_32
+        default = 'NA'
+        f = ft.FeatureSource(name, f_type, default=default)
+        self.assertIsInstance(f, ft.FeatureSource, f'Unexpected Type {type(f)}')
+        self.assertEqual(f.name, name, f'Feature Name should be {name}')
+        self.assertEqual(f.type, f_type, f'Feature Type should be {f_type}')
+        self.assertEqual(f.default, default, f'Default should be {default}')
+        self.assertIsNone(f.format_code, 'Should not have format code')
+        self.assertEqual(len(f.embedded_features), 0, 'Should not have embedded features')
+        self.assertEqual(f.learning_category, ft.LEARNING_CATEGORY_CATEGORICAL, f'Int should have learning type CAT')
+
+    def test_creation_float(self):
+        name = 'test'
+        f_type = ft.FEATURE_TYPE_FLOAT_32
+        default = 'NA'
+        f = ft.FeatureSource(name, f_type, default=default)
+        self.assertIsInstance(f, ft.FeatureSource, f'Unexpected Type {type(f)}')
+        self.assertEqual(f.name, name, f'Feature Name should be {name}')
+        self.assertEqual(f.type, f_type, f'Feature Type should be {f_type}')
+        self.assertEqual(f.default, default, f'Default should be {default}')
+        self.assertIsNone(f.format_code, 'Should not have format code')
+        self.assertEqual(len(f.embedded_features), 0, 'Should not have embedded features')
+        self.assertEqual(f.learning_category, ft.LEARNING_CATEGORY_CONTINUOUS, f'Float should have learning type Cont')
+
     def test_create_source_time_without_format_code_bad(self):
         name = 'test'
         f_type = ft.FEATURE_TYPE_DATE_TIME

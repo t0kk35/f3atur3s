@@ -26,6 +26,7 @@ from .features.featureonehot import FeatureOneHot
 from .features.featureexpression import FeatureExpression
 from .features.featureexpression import FeatureExpressionSeries
 from .features.featurefilter import FeatureFilter
+from .common.feature import FeatureLabel
 from .features.featurelabelbinary import FeatureLabelBinary
 from .common.feature import FeatureNormalizeLogBase
 from .features.featurenormalizescale import FeatureNormalizeScale
