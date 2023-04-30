@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from .typechecking import enforce_types
 from .learningcategory import LearningCategory, LEARNING_CATEGORY_CATEGORICAL, LEARNING_CATEGORY_LABEL
 from .learningcategory import LEARNING_CATEGORY_CONTINUOUS, LEARNING_CATEGORY_NONE
-from .featuretype import FeatureType, FeatureTypeInteger, FeatureTypeFloat, FeatureTypeNumerical, FeatureTypeString
+from .featuretype import FeatureType, FeatureTypeInteger, FeatureTypeFloat, FeatureTypeString
 from .featuretype import FeatureTypeBool, FeatureTypeNumerical, FeatureTypeTimeBased
 from .featuretype import FeatureTypeHelper
 from .exception import FeatureDefinitionException, not_implemented
@@ -132,9 +132,23 @@ class FeatureCategorical(Feature, ABC):
     """
     @abstractmethod
     def __len__(self):
-        """Return the cardinality of the categorical feature.
+        """
+        Return the cardinality of the categorical feature.
 
-        @return: Integer value, the cardinality of the categorical feature.
+        Returns:
+            Integer value, the cardinality of the categorical feature.
+        """
+        return not_implemented(self)
+
+    @property
+    @abstractmethod
+    def index_to_label(self) -> Dict[int, Any]:
+        """
+        Return a dictionary that maps an index to a label (string). This will be used in various visualizing features.
+        For instance in bar charts and scatter plots of Embeddings.
+
+        Returns:
+            A Dictionary with the index (int) as key and the label (str) as value
         """
         return not_implemented(self)
 
@@ -366,7 +380,8 @@ class FeatureSeriesBased(Feature, ABC):
         lc = list(set([f.learning_category for f in self.series_features]))
         if LEARNING_CATEGORY_NONE in lc:
             raise FeatureDefinitionException(
-                f'Found (a) Feature(s) {[f.name for f in features if f.learning_category == LEARNING_CATEGORY_NONE]} ' +
+                f'Found (a) Feature(s) ' +
+                f' {[f.name for f in self.series_features if f.learning_category == LEARNING_CATEGORY_NONE]} ' +
                 f'with LEARNING_CATEGORY_NONE. This function can not process those'
             )
 

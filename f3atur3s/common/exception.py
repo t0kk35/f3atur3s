@@ -15,6 +15,13 @@ class FeatureDefinitionException(Exception):
     def __init__(self, message: str):
         super().__init__("Error Defining Feature: " + message)
 
+class FeatureRunTimeException(Exception):
+    """
+    Exception thrown when there is a run-time problem
+    """
+    def __init__(self, message: str):
+        super().__init__("Error Using Feature: " + message)
+
 
 class TensorDefinitionException(Exception):
     """ Exception thrown when the creation of a TensorDefinition fails

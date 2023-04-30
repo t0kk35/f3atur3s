@@ -2,12 +2,12 @@
 Definition of the Time Formatter feature. It is a feature that can re-format a date feature.
 (c) 2023 tsm
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Any, Dict
 
 from ..common.learningcategory import LearningCategory
 from ..common.typechecking import enforce_types
-from ..common.feature import Feature, FeatureWithBaseFeature, FeatureCategorical
+from ..common.feature import Feature, FeatureWithBaseFeature
 
 
 @enforce_types

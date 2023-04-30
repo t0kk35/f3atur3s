@@ -29,6 +29,8 @@ class TestFeatureBin(unittest.TestCase):
         self.assertEqual(bn.scale_type, 'linear', f'Default ScaleType should have been Linear')
         self.assertEqual(bn.range, list(range(1, nr_bin)), f'Unexpected Range. Got {bn.range}')
         self.assertIsInstance(hash(bn), int, f'Hash function not working')
+        with self.assertRaises(ft.FeatureRunTimeException):
+            _ = bn.index_to_label
 
     def test_creation_bad_base(self):
         name = 'Bin'

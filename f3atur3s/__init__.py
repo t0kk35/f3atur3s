@@ -2,6 +2,7 @@
 Import for the main F3ATUR3S module
 (c) tsm 2023
 """
+from .common.exception import FeatureRunTimeException, FeatureDefinitionException
 from .common.featuretype import FeatureType
 from .common.featuretype import FEATURE_TYPE_FLOAT_32, FEATURE_TYPE_FLOAT_64, FEATURE_TYPE_FLOAT
 from .common.featuretype import FEATURE_TYPE_INT_16, FEATURE_TYPE_INT_8, FEATURE_TYPE_INT_32, FEATURE_TYPE_INT_64
@@ -15,7 +16,7 @@ from .common.featuretype import FeatureTypeString, FeatureTypeTimeBased, Feature
 from .common.learningcategory import LearningCategory, LEARNING_CATEGORY_CATEGORICAL, LEARNING_CATEGORY_BINARY
 from .common.learningcategory import LEARNING_CATEGORY_CONTINUOUS, LEARNING_CATEGORY_LABEL, LEARNING_CATEGORIES_MODEL
 from .common.learningcategory import LEARNING_CATEGORY_NONE
-from .common.feature import Feature, FeatureExpander, FeatureCategorical, FeatureDefinitionException
+from .common.feature import Feature, FeatureExpander, FeatureCategorical
 from .features.featuresource import FeatureSource
 from .features.featureindex import FeatureIndex
 from .features.featurebin import FeatureBin

@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import List, Any, Dict
 
 from ..common.typechecking import enforce_types
+from ..common.exception import FeatureRunTimeException
 from ..common.feature import Feature, FeatureWithBaseFeature, FeatureCategorical
 
 
@@ -27,11 +28,22 @@ class FeatureBin(FeatureWithBaseFeature, FeatureCategorical):
         self.embedded_features = self.get_base_and_base_embedded_features()
 
     def __len__(self):
+        # Need to add one, we will also have an unknown/0 value.
         return self.number_of_bins
 
     @property
+    def index_to_label(self) -> Dict[int, Any]:
+        if self.inference_ready:
+            d = {0: 'UNK'}
+            d.update({i+1: round(self.bins[i], 3) for i in range(0, self.number_of_bins-1)})
+            return d
+        else:
+            raise FeatureRunTimeException(f'Can not access the index_to_label property of feature {self.name}' +
+                                          f' it is not ready for inference. Please perform an inference run first')
+
+    @property
     def range(self) -> List[int]:
-        return list(range(1, self.number_of_bins))
+        return list(range(1, len(self)))
 
     @property
     def inference_ready(self) -> bool:

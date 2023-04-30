@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Any, List
 
 from ..common.typechecking import enforce_types
+from ..common.exception import FeatureRunTimeException
 from ..common.feature import Feature, FeatureWithBaseFeature, FeatureCategorical
 
 
@@ -31,6 +32,16 @@ class FeatureIndex(FeatureWithBaseFeature, FeatureCategorical):
     @property
     def inference_ready(self) -> bool:
         return self.dictionary is not None
+
+    @property
+    def index_to_label(self) -> Dict[int, Any]:
+        if self.inference_ready:
+            return {v: k for k, v in self.dictionary.items()}
+        else:
+            raise FeatureRunTimeException(
+                f'Can not access the index_to_label property of feature {self.name} before is not ready for ' +
+                f'inference. Please perform an inference run first.'
+            )
 
     @classmethod
     def create_from_save(cls, fields: Dict[str, Any], embedded_features: List[Feature], pkl: Any) -> 'FeatureIndex':

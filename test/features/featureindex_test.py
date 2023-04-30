@@ -24,6 +24,8 @@ class TestIndexFeature(unittest.TestCase):
         self.assertEqual(fi.learning_category, ft.LEARNING_CATEGORY_CATEGORICAL, f'Learning type should be CATEGORICAL')
         self.assertIsNone(fi.dictionary, f'Dictionary should be None')
         self.assertIsInstance(hash(fi), int, f'Hash function not working')
+        with self.assertRaises(ft.FeatureRunTimeException):
+            _ = fi.index_to_label
 
     def test_creation_non_int_type(self):
         name = 'index'
