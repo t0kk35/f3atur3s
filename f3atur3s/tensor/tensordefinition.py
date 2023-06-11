@@ -11,6 +11,7 @@ from ..common.learningcategory import LearningCategory, LEARNING_CATEGORY_CATEGO
 from ..common.learningcategory import LEARNING_CATEGORY_BINARY, LEARNING_CATEGORY_LABEL, LEARNING_CATEGORIES_MODEL
 from ..features.featureindex import FeatureIndex
 from ..features.featureonehot import FeatureOneHot
+from ..common.feature import FeatureSeriesBased
 from .featurehelper import FeatureHelper
 
 
@@ -328,3 +329,33 @@ class TensorDefinition:
              A list of features that returned False to the inference_ready call
         """
         return [f for f in self.embedded_features if f.inference_ready]
+
+    @property
+    def is_series_based(self) -> bool:
+        """
+        Return true is the series is series based, i.e. if the tensor definition has a series feature.
+
+        Returns:
+            A boolean True if the TensorDefinition is series based.
+        """
+        return isinstance(self.features[0], FeatureSeriesBased)
+
+    @property
+    def series_feature(self) -> FeatureSeriesBased:
+        """
+        Return the single series feature in the tensor definition. A Tensor Definition should only ever have a single
+        FeatureSeriesBased in it. We don't allow multiple FeatureSeriesBased features in a single TensorDefinition.
+
+        Returns:
+            The Feature series object in the TensorDefinition.
+
+        Raises:
+            TensorDefinitionException if the tensor definition is not series based.
+        """
+        f = self.features[0]
+        if isinstance(f, FeatureSeriesBased) and self.is_series_based:
+            return f
+        else:
+            raise TensorDefinitionException(
+                f'The first feature of this Tensor Definition {f.name} is not a FeatureSeriesBased feature.'
+            )

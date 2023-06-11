@@ -34,7 +34,7 @@ class FeatureBin(FeatureWithBaseFeature, FeatureCategorical):
     @property
     def index_to_label(self) -> Dict[int, Any]:
         if self.inference_ready:
-            d = {0: 'UNK'}
+            d = {0: '*_UNK_*'}
             d.update({i+1: round(self.bins[i], 3) for i in range(0, self.number_of_bins-1)})
             return d
         else:
