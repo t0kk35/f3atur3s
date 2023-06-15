@@ -56,10 +56,10 @@ class TestFeatureDateTimeFormatSaveLoad(unittest.TestCase):
         shutil.rmtree(save_file, ignore_errors=True)
 
     def test_load_base(self):
-        save_file = './load-bin-base'
+        save_file = './load-date-time-format-base'
         shutil.rmtree(save_file, ignore_errors=True)
         n_base = 'base-test'
-        n_fmt = 'bin-test'
+        n_fmt = 'fmt-test'
         td_name = 'base'
         fmt = '%w'
         f_type = ft.FEATURE_TYPE_INT_16

@@ -36,6 +36,10 @@ class FeatureOneHot(FeatureExpander):
         return self.expand_names is not None
 
     @property
+    def delimiter(self) -> str:
+        return '__'
+
+    @property
     def learning_category(self) -> LearningCategory:
         # Treat One Hot Features as 'Binary' learning category. Even though they are encoded as integers.
         return LEARNING_CATEGORY_BINARY

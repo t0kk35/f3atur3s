@@ -288,6 +288,19 @@ class FeatureExpander(FeatureWithBaseFeature, ABC):
         """
         return not_implemented(self)
 
+    @property
+    @abstractmethod
+    def delimiter(self) -> str:
+        """
+        Property that returns the string to be used to delimit names. An expander feature will create multiple new
+        features. In order to make the names unique it will assign names that are [ORIGINAL_NAME] + delimiter +
+        [UNIQUE_STRING]
+
+        Returns:
+            A string object, which is used to delimit the expanded names
+        """
+        pass
+
 
 @enforce_types
 @dataclass(unsafe_hash=True)
