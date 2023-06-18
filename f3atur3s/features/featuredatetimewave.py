@@ -8,6 +8,7 @@ from typing import List, Any, Dict
 from ..common.learningcategory import LearningCategory
 from ..common.typechecking import enforce_types
 from ..common.feature import Feature, FeatureWithBaseFeature, FeatureExpander
+from .featurevirtual import FeatureVirtual
 
 
 @enforce_types
