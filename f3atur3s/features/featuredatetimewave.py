@@ -26,7 +26,7 @@ class FeatureDateTimeWave(FeatureExpander, FeatureWithBaseFeature):
         self.val_float_type()
         # Set the expand_names
         self.expand_names = [
-            f'{self.base_feature.name}{self.delimiter}{w}{self.delimiter}{f}'
+            f'{self.name}{self.delimiter}{w}{self.delimiter}{f}'
             for f in range(self.frequencies) for w in ('sin', 'cos')
         ]
         # By default; return set embedded features to be the base feature.
