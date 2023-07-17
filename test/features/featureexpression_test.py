@@ -13,6 +13,8 @@ from typing import Any
 def feature_expression(param: int):
     return param == 1
 
+def feature_expression_add(param1: int, param2: int):
+    return param1 + param2
 
 class TestFeatureExpression(unittest.TestCase):
     def test_creation_base(self):
@@ -65,10 +67,19 @@ class TestFeatureExpression(unittest.TestCase):
         with self.assertRaises(TypeError):
             _ = ft.FeatureExpression(name, f_type, bad, par)
 
+    def test_multiple_parameters(self):
+        name = 'expr'
+        f_type = ft.FEATURE_TYPE_INT_16
+        sf1 = ft.FeatureSource('Source', ft.FEATURE_TYPE_INT_16)
+        sf2 = ft.FeatureSource('Source', ft.FEATURE_TYPE_INT_16)
+        par = [sf1, sf2]
+        ef = ft.FeatureExpression(name, f_type, feature_expression_add, par)
+        self.assertEqual(type(ef), ft.FeatureExpression)
+
     def test_creation_bad_param(self):
         name = 'expr'
         f_type = ft.FEATURE_TYPE_INT_16
-        sf = ft.FeatureSource('Source', ft.FEATURE_TYPE_INT_16)
+        sf = ft.FeatureSource('Source', ft.FEATURE_TYPE_INT_16)F
         par_1: Any = ''
         # Param not a list
         with self.assertRaises(TypeError):
