@@ -79,7 +79,7 @@ class TestFeatureExpression(unittest.TestCase):
     def test_creation_bad_param(self):
         name = 'expr'
         f_type = ft.FEATURE_TYPE_INT_16
-        sf = ft.FeatureSource('Source', ft.FEATURE_TYPE_INT_16)F
+        sf = ft.FeatureSource('Source', ft.FEATURE_TYPE_INT_16)
         par_1: Any = ''
         # Param not a list
         with self.assertRaises(TypeError):
